@@ -78,16 +78,33 @@ document.addEventListener('DOMContentLoaded',function(){
     });
   }
 
-  // contact form -> opens a pre-filled email (works with no backend)
+  // contact form: posts to a Formspree endpoint if set (data-endpoint),
+  // otherwise falls back to opening a pre-filled email. No page reload.
   var form=document.getElementById('contactForm');
   if(form){
+    var get=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+    var status=document.createElement('p');
+    status.className='form-msg';status.setAttribute('role','status');
+    form.appendChild(status);
     form.addEventListener('submit',function(e){
       e.preventDefault();
-      var get=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
-      var name=get('cfName'),firm=get('cfFirm'),email=get('cfEmail'),interest=get('cfInterest'),msg=get('cfMsg');
-      var subject='ChatGuard enquiry — '+(firm||name||'website');
-      var body='Name: '+name+'\nFirm: '+firm+'\nEmail: '+email+'\nInterested in: '+interest+'\n\n'+msg;
-      window.location.href='mailto:info@chatguard.co?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+      var d={name:get('cfName'),firm:get('cfFirm'),email:get('cfEmail'),interest:get('cfInterest'),message:get('cfMsg')};
+      if(!d.name||!d.email){status.textContent='Please add your name and a work email.';status.className='form-msg err';return;}
+      var endpoint=(form.getAttribute('data-endpoint')||'').trim();
+      if(endpoint){
+        status.textContent='Sending…';status.className='form-msg';
+        fetch(endpoint,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(d)})
+          .then(function(r){
+            if(r.ok){form.reset();status.textContent='Thanks — we\u2019ll be in touch shortly.';status.className='form-msg ok';}
+            else{throw new Error('bad');}
+          })
+          .catch(function(){status.textContent='Something went wrong. Please email info@chatguard.co.';status.className='form-msg err';});
+      }else{
+        var subject='ChatGuard enquiry — '+(d.firm||d.name||'website');
+        var body='Name: '+d.name+'\nFirm: '+d.firm+'\nEmail: '+d.email+'\nInterested in: '+d.interest+'\n\n'+d.message;
+        window.location.href='mailto:info@chatguard.co?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+        status.textContent='Opening your email app…';status.className='form-msg ok';
+      }
     });
   }
 });

@@ -410,3 +410,6 @@ footer{border-top:1px solid var(--line);padding:60px 0 36px;margin-top:30px}
 @media(max-width:520px){.form-row{grid-template-columns:1fr}}
 .form-card .btn{width:100%;justify-content:center;margin-top:6px}
 .form-note{font-size:12px;color:var(--fg-faint);margin-top:14px;text-align:center}
+.form-msg{font-size:13.5px;margin-top:14px;text-align:center;min-height:1.2em}
+.form-msg.ok{color:var(--green)}
+.form-msg.err{color:var(--red)}
