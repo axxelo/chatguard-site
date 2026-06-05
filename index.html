@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0A0E16">
+<link rel="canonical" href="https://www.chatguard.co/">
 <title>ChatGuard — Bloomberg Chat Intelligence & Compliance</title>
 <meta name="description" content="ChatGuard turns Bloomberg chat and email archives into compliance-grade records and desk intelligence. Built for Axtrade Capital and regulated firms.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,12 +18,14 @@
 <meta property="og:image" content="og-image.png">
 <meta property="og:url" content="https://www.chatguard.co/">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"ChatGuard","url":"https://www.chatguard.co/","logo":"https://www.chatguard.co/favicon.png","description":"Communications surveillance and desk-intelligence platform for Bloomberg chat, email and voice.","parentOrganization":{"@type":"Organization","name":"Axtrade Capital"},"sameAs":["https://www.linkedin.com/company/100678182/"],"contactPoint":{"@type":"ContactPoint","telephone":"+44-20-3966-7807","email":"info@chatguard.co","contactType":"sales"},"address":[{"@type":"PostalAddress","streetAddress":"67 Redcliffe Gardens","addressLocality":"London","postalCode":"SW10 9JJ","addressCountry":"GB"},{"@type":"PostalAddress","streetAddress":"35 Rue Cler","addressLocality":"Paris","postalCode":"75007","addressCountry":"FR"},{"@type":"PostalAddress","streetAddress":"111 Congress Ave, Suite 500","addressLocality":"Austin","addressRegion":"TX","postalCode":"78701","addressCountry":"US"}]}</script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
 <header id="hdr">
   <nav>
-    <a href="index.html" class="logo"><span class="mark"></span>Chat<b>Guard</b></a>
+    <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="cgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2A93B"/><stop offset="1" stop-color="#37D6A0"/></linearGradient></defs><path d="M16 2.5 27 6.1v8.2c0 7.4-5.2 12.1-11 14.7-5.8-2.6-11-7.3-11-14.7V6.1z" fill="none" stroke="url(#cgg)" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.6 11.4h10.8c.7 0 1.2.5 1.2 1.2v4.5c0 .7-.5 1.2-1.2 1.2H15l-3.1 2.9v-2.9h-1.3c-.7 0-1.2-.5-1.2-1.2v-4.5c0-.7.5-1.2 1.2-1.2z" fill="url(#cgg)"/></svg>Chat<b>Guard</b></a>
     <div class="navlinks">
       <a href="services.html">Services</a>
       <a href="benefits.html">Benefits</a>
@@ -36,12 +40,14 @@
       </button>
       <a href="https://monitoring.chatguard.co" class="btn btn-ghost">Log in</a>
       <a href="#contact" class="btn btn-solid">Book a demo</a>
+      <button class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </nav>
+  <div class="mobile-menu" id="mobileMenu"><a href="services.html">Services</a><a href="benefits.html">Benefits</a><a href="industries.html">Industries</a><a href="#channels">Channels</a><a href="#contact">Contact</a><a href="https://monitoring.chatguard.co">Log in</a><a class="btn btn-solid" href="#contact">Book a demo</a></div>
 </header>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero" id="main">
   <div class="wrap hero-grid">
     <div>
       <span class="eyebrow reveal">Bloomberg chat · email · voice surveillance</span>
@@ -217,15 +223,38 @@
   </div>
 </section>
 
-<!-- CTA -->
+<!-- CONTACT -->
 <section id="contact">
   <div class="wrap">
-    <div class="cta reveal">
-      <h2>See what your conversations have been telling you.</h2>
-      <p>Book a walkthrough of ChatGuard on your own Bloomberg and email data — desk intelligence for your traders, compliance cover for your firm.</p>
-      <div class="cta-btns">
-        <a href="tel:+442039667807" class="btn btn-solid">Call +44 20 3966 7807</a>
-        <a href="mailto:info@chatguard.co" class="btn btn-ghost">info@chatguard.co</a>
+    <div class="contact-grid">
+      <div class="contact-intro reveal">
+        <span class="eyebrow">Get in touch</span>
+        <h2>See what your conversations have been telling you.</h2>
+        <p>Book a walkthrough of ChatGuard on your own Bloomberg and email data — desk intelligence for your traders, compliance cover for your firm.</p>
+        <div class="contact-points">
+          <a href="tel:+442039667807"><span class="ci"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>+44 20 3966 7807</a>
+          <a href="mailto:info@chatguard.co"><span class="ci"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="m22 7-10 6L2 7"/></svg></span>info@chatguard.co</a>
+        </div>
+      </div>
+      <div class="form-card reveal" style="transition-delay:.08s">
+        <form id="contactForm" novalidate>
+          <div class="form-row">
+            <div class="field"><label for="cfName">Name</label><input id="cfName" type="text" autocomplete="name" required></div>
+            <div class="field"><label for="cfFirm">Firm</label><input id="cfFirm" type="text" autocomplete="organization"></div>
+          </div>
+          <div class="field"><label for="cfEmail">Work email</label><input id="cfEmail" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="cfInterest">I'm interested in</label>
+            <select id="cfInterest">
+              <option>Desk Intelligence (productivity)</option>
+              <option>Compliance &amp; HR tooling</option>
+              <option>Both</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div class="field"><label for="cfMsg">Message</label><textarea id="cfMsg" placeholder="Tell us about your channels and obligations…"></textarea></div>
+          <button type="submit" class="btn btn-solid">Request a demo →</button>
+          <p class="form-note">Opens your email client, pre-filled to info@chatguard.co. No data is stored by this page.</p>
+        </form>
       </div>
     </div>
   </div>
@@ -236,7 +265,7 @@
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <a href="index.html" class="logo" style="margin-bottom:18px"><span class="mark"></span>Chat<b>Guard</b></a>
+        <a href="index.html" class="logo" style="margin-bottom:18px"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="cgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2A93B"/><stop offset="1" stop-color="#37D6A0"/></linearGradient></defs><path d="M16 2.5 27 6.1v8.2c0 7.4-5.2 12.1-11 14.7-5.8-2.6-11-7.3-11-14.7V6.1z" fill="none" stroke="url(#cgg)" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.6 11.4h10.8c.7 0 1.2.5 1.2 1.2v4.5c0 .7-.5 1.2-1.2 1.2H15l-3.1 2.9v-2.9h-1.3c-.7 0-1.2-.5-1.2-1.2v-4.5c0-.7.5-1.2 1.2-1.2z" fill="url(#cgg)"/></svg>Chat<b>Guard</b></a>
         <p style="max-width:280px">The ultimate compliance chat monitoring &amp; desk-intelligence platform. Archive, monitor and analyse every channel — and put the data to work.</p>
         <p class="mono" style="color:var(--fg-faint);margin-top:10px">A product of Axtrade Capital</p>
       </div>
