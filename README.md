@@ -1,152 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Industries — ChatGuard</title>
-<meta name="description" content="Where ChatGuard operates: the financial sector and beyond. Communications surveillance and intelligence for regulated, reputation-sensitive industries.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/chatguard.css">
-</head>
-<body>
+# ChatGuard site (flat layout for GitHub Pages)
 
-<header id="hdr">
-  <nav>
-    <a href="index.html" class="logo"><span class="mark"></span>Chat<b>Guard</b></a>
-    <div class="navlinks">
-      <a href="services.html">Services</a>
-      <a href="benefits.html">Benefits</a>
-      <a href="industries.html" class="active">Industries</a>
-      <a href="index.html#channels">Channels</a>
-      <a href="index.html#contact">Contact</a>
-    </div>
-    <div class="nav-cta">
-      <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
-        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
-      </button>
-      <a href="https://monitoring.chatguard.co" class="btn btn-ghost">Log in</a>
-      <a href="index.html#contact" class="btn btn-solid">Book a demo</a>
-    </div>
-  </nav>
-</header>
+All files sit at the repository ROOT — no subfolders. This is the layout that
+uploads cleanly via GitHub's web "Add files" page.
 
-<section class="page-hero">
-  <div class="wrap">
-    <div class="crumb reveal"><a href="index.html">Home</a> / Industries</div>
-    <h1 class="reveal" style="transition-delay:.05s">Built for the <span class="em g">regulated</span> and the <span class="em">reputation-sensitive</span>.</h1>
-    <p class="reveal" style="transition-delay:.1s">From the financial sector to pharmaceuticals, we help organisations of every size tackle the communications challenges they face — and comply while protecting their reputation.</p>
-    <div class="chips reveal" style="transition-delay:.15s;margin-top:24px">
-      <span class="chip on">Financial services</span>
-      <span class="chip">Asset management</span>
-      <span class="chip">Brokerage &amp; trading</span>
-      <span class="chip">Pharmaceuticals</span>
-      <span class="chip">Insurance</span>
-      <span class="chip">Legal &amp; professional</span>
-      <span class="chip">Energy &amp; commodities</span>
-    </div>
-  </div>
-</section>
+  index.html  services.html  benefits.html  industries.html
+  chatguard.css   chatguard.js
+  favicon.png  og-image.png   README.md
 
-<!-- FINANCIAL DEEP DIVE -->
-<section>
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow green">Primary use case · the financial industry</span>
-      <h2>The challenges a financial firm has to monitor for.</h2>
-      <p>Each of these is a place where a complete, analysable communications record is the difference between catching an issue and explaining one to a regulator. Expand any challenge to see how ChatGuard helps.</p>
-    </div>
+The HTML references chatguard.css / chatguard.js directly (no assets/ folder).
 
-    <div class="acc reveal">
-      <details open>
-        <summary><span class="ai">01</span>Anti-Money Laundering (AML) &amp; Know Your Customer (KYC)<span class="plus">+</span></summary>
-        <div class="acc-body">Institutions must ensure they aren't unwittingly involved in money laundering or terrorist financing — failures bring significant fines. <strong>ChatGuard</strong> monitors communications for the language and patterns associated with structuring and evasion, and preserves a defensible KYC-adjacent record.</div>
-      </details>
-      <details>
-        <summary><span class="ai">02</span>Market manipulation &amp; insider trading<span class="plus">+</span></summary>
-        <div class="acc-body">Detecting manipulation and the misuse of inside information demands effective surveillance. <strong>ChatGuard</strong> flags suspicious coordination, "off the record" requests and tip-like exchanges across chat, email and voice — surfacing them for review before they become enforcement actions.</div>
-      </details>
-      <details>
-        <summary><span class="ai">03</span>Fraud prevention<span class="plus">+</span></summary>
-        <div class="acc-body">Fraud and identity theft evolve constantly. <strong>ChatGuard</strong>'s pattern recognition highlights anomalous behaviour and communications inconsistent with normal activity, helping teams stay ahead of emerging schemes.</div>
-      </details>
-      <details>
-        <summary><span class="ai">04</span>Ethical concerns &amp; conduct<span class="plus">+</span></summary>
-        <div class="acc-body">Unethical practices cause reputational damage long before regulators get involved. Sentiment and policy analysis surface conduct that runs against the firm's values, enabling early, documented intervention.</div>
-      </details>
-      <details>
-        <summary><span class="ai">05</span>Regulatory change<span class="plus">+</span></summary>
-        <div class="acc-body">Rules shift frequently, and keeping up is a challenge in itself. Configurable alert rules and policy templates let you adapt monitoring as obligations change — without re-platforming.</div>
-      </details>
-      <details>
-        <summary><span class="ai">06</span>Litigation &amp; legal action<span class="plus">+</span></summary>
-        <div class="acc-body">Lawsuits from customers, competitors or regulators are costly and damaging. An immutable, timestamped archive gives you a complete, retrievable evidence base when you need to defend the firm's position.</div>
-      </details>
-      <details>
-        <summary><span class="ai">07</span>Customer complaints &amp; disputes<span class="plus">+</span></summary>
-        <div class="acc-body">Mishandled complaints invite reputational damage and scrutiny. Full conversation history lets you reconstruct exactly what was said and resolve disputes fairly and quickly.</div>
-      </details>
-      <details>
-        <summary><span class="ai">08</span>ESG &amp; disclosure<span class="plus">+</span></summary>
-        <div class="acc-body">Investors and customers increasingly weigh environmental, social and governance conduct. A reliable communications record supports transparent disclosure and helps evidence that commitments are being met.</div>
-      </details>
-    </div>
-  </div>
-</section>
+## Deploy with GitHub Pages
+1. Repo → Settings → Pages
+2. Source: Deploy from a branch → branch: main → folder: / (root) → Save
+3. Live at https://axxelo.github.io/chatguard-site/
 
-<!-- OTHER INDUSTRIES -->
-<section style="border-top:1px solid var(--line)">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow">Beyond finance</span>
-      <h2>Wherever conversations carry risk — or value.</h2>
-    </div>
-    <div class="fgrid">
-      <div class="fcard am reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M10 2v6L4 18a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-10V2M8 2h8M9 14h6"/></svg></div><h4>Pharmaceuticals</h4><p>Document interactions and protect against off-label and disclosure risk in a heavily scrutinised sector.</p></div>
-      <div class="fcard am reveal" style="transition-delay:.05s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div><h4>Insurance</h4><p>Evidence fair customer treatment and capture the record behind every quote, claim and complaint.</p></div>
-      <div class="fcard am reveal" style="transition-delay:.1s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3 2 9l10 6 10-6zM2 9v6l10 6 10-6V9"/></svg></div><h4>Legal &amp; professional</h4><p>Maintain privileged, well-governed communications with a clear, searchable trail for matters and audits.</p></div>
-      <div class="fcard am reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div><h4>Energy &amp; commodities</h4><p>Surveil trading desks for manipulation and conduct risk across volatile, regulated markets.</p></div>
-      <div class="fcard am reveal" style="transition-delay:.05s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l3-3 3 3 5-7"/></svg></div><h4>Asset management</h4><p>Keep best-execution and suitability conversations on the record and instantly retrievable.</p></div>
-      <div class="fcard am reveal" style="transition-delay:.1s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h4>Any chat-driven business</h4><p>If your people make decisions in chat, there's signal and risk worth capturing. Talk to us.</p></div>
-    </div>
-  </div>
-</section>
+## Custom domain chatguard.co
+Settings → Pages → Custom domain → chatguard.co, then create the DNS records
+GitHub shows (typically four A records on the apex to 185.199.108-111.153 and a
+CNAME www → axxelo.github.io). This replaces the current Bitrix24 site; leave
+monitoring.chatguard.co DNS untouched.
 
-<section id="contact">
-  <div class="wrap">
-    <div class="cta reveal">
-      <h2>Tell us about your sector.</h2>
-      <p>Every industry has its own obligations and its own conversations. We'll tailor capture, alerts and reporting to yours.</p>
-      <div class="cta-btns">
-        <a href="tel:+442039667807" class="btn btn-solid">Call +44 20 3966 7807</a>
-        <a href="mailto:info@chatguard.co" class="btn btn-ghost">info@chatguard.co</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <a href="index.html" class="logo" style="margin-bottom:18px"><span class="mark"></span>Chat<b>Guard</b></a>
-        <p style="max-width:280px">The ultimate compliance chat monitoring &amp; desk-intelligence platform.</p>
-        <p class="mono" style="color:var(--fg-faint);margin-top:10px">A product of Axtrade Capital</p>
-      </div>
-      <div><h5>Platform</h5><a href="services.html">Services</a><a href="services.html#intelligence">Desk Intelligence</a><a href="services.html#compliance">Compliance &amp; HR</a><a href="index.html#security">Security</a><a href="https://monitoring.chatguard.co">Log in</a></div>
-      <div><h5>Company</h5><a href="benefits.html">Benefits</a><a href="industries.html">Industries</a><a href="index.html#channels">Channels</a><a href="index.html#contact">Contact</a><a href="https://www.linkedin.com/company/100678182/">LinkedIn</a></div>
-      <div><h5>Offices</h5><p class="office"><b>United Kingdom</b>67 Redcliffe Gardens, SW10 9JJ London</p><p class="office"><b>France</b>35 Rue Cler, 75007 Paris</p><p class="office"><b>USA</b>111 Congress Ave, Suite 500, Austin, TX 78701</p></div>
-    </div>
-    <div class="foot-bottom">
-      <span>© 2026 ChatGuard. All rights reserved.</span>
-      <span style="display:flex;gap:20px"><a href="https://www.chatguard.co/privacypolicy/">Privacy Policy</a><a href="https://www.chatguard.co/cookiepolicy/">Cookie Policy</a><a href="https://www.chatguard.co/FAQS/">FAQ</a></span>
-    </div>
-    <p class="disclaimer">ChatGuard provides communications surveillance and analytics tooling. Monitoring of employee communications must be carried out in line with applicable employment, data-protection and privacy laws (including UK GDPR). ChatGuard does not provide legal advice.</p>
-  </div>
-</footer>
-
-<script src="assets/chatguard.js"></script>
-</body>
-</html>
+## Before publishing
+- Dashboard figures and counterparty names (Meridian Cap, Northbridge) are placeholders.
+- Re-verify the FCA stats (£52.8m, 1,266 firms) before relying on them.
+- Footer disclaimer is a placeholder, not legal advice.

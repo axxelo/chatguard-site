@@ -1,52 +1,178 @@
-# ChatGuard site — build notes
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — ChatGuard</title>
+<meta name="description" content="ChatGuard services: Bloomberg desk intelligence for traders, plus compliance, HR and surveillance tooling for regulated firms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chatguard.css">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Services — ChatGuard">
+<meta property="og:description" content="ChatGuard services: Bloomberg desk intelligence for traders, plus compliance, HR and surveillance tooling for regulated firms.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:url" content="https://www.chatguard.co/">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
 
-A four-page static site on one shared design system.
+<header id="hdr">
+  <nav>
+    <a href="index.html" class="logo"><span class="mark"></span>Chat<b>Guard</b></a>
+    <div class="navlinks">
+      <a href="services.html" class="active">Services</a>
+      <a href="benefits.html">Benefits</a>
+      <a href="industries.html">Industries</a>
+      <a href="index.html#channels">Channels</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+      </button>
+      <a href="https://monitoring.chatguard.co" class="btn btn-ghost">Log in</a>
+      <a href="index.html#contact" class="btn btn-solid">Book a demo</a>
+    </div>
+  </nav>
+</header>
 
-```
-chatguard-site/
-├── index.html          Home (hero, two engines, extraction, compliance, channels, security)
-├── services.html       Desk Intelligence + Compliance/HR + Deployment service lines
-├── benefits.html       Why-us + dual outcome panels + risk stats
-├── industries.html     Financial-sector accordion + other sectors
-└── assets/
-    ├── chatguard.css   ALL styling, both themes (dark default + light)
-    └── chatguard.js    Theme toggle (persisted), scroll reveals, stat counters
-```
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="wrap">
+    <div class="crumb reveal"><a href="index.html">Home</a> / Services</div>
+    <h1 class="reveal" style="transition-delay:.05s">One captured record. <span class="em">Two</span> sets of <span class="em g">services</span>.</h1>
+    <p class="reveal" style="transition-delay:.1s">Everything ChatGuard does sits on a single encrypted archive of your communications. From there we run two service lines — desk intelligence that makes traders faster, and compliance &amp; HR tooling that keeps the firm safe — plus the deployment and support to stand it all up.</p>
+  </div>
+</section>
 
-## Themes
-Light/dark is driven entirely by CSS variables. The toggle in the nav sets
-`data-theme="light"` on `<html>` and saves the choice to `localStorage` (key
-`cg-theme`), so it persists across pages and visits. Remove the toggle button
-to lock a single theme, or set `<html data-theme="light">` to default to light.
-The Bloomberg terminal and dashboard mock-ups stay dark in both themes by design.
+<!-- DESK INTELLIGENCE -->
+<section id="intelligence">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow amber">Service line 01 · Desk Intelligence</span>
+      <h2>Make your Bloomberg chat work for the desk.</h2>
+      <p>For Axtrade's traders, desk heads and COO. We mine the conversations your team is already having and turn them into structured, queryable productivity data.</p>
+    </div>
 
-## Putting it into Bitrix24
-Bitrix24's site builder doesn't import raw HTML pages directly, so there are two
-realistic routes:
+    <div>
+      <div class="srow reveal">
+        <div class="si">01</div>
+        <div>
+          <h3>RFQ &amp; quote extraction</h3>
+          <p>Our NLP reads free-text Bloomberg chat and identifies requests for quotes, the prices shown, and the fills — structuring shorthand like "25m EUR/USD where are you" into a clean, searchable trade-conversation book.</p>
+          <div class="meta"><span>Inputs: IB chat, persistent rooms</span><span>Output: structured RFQ ledger</span><span>Real-time</span></div>
+        </div>
+      </div>
+      <div class="srow reveal">
+        <div class="si">02</div>
+        <div>
+          <h3>Counterparty &amp; flow analytics</h3>
+          <p>See which counterparties you talk to most, average response times, win/hit rates by name and instrument, and where flow is quietly drying up. Spot the relationship that's gone cold before it shows up in the P&amp;L.</p>
+          <div class="meta"><span>Hit-rate by counterparty</span><span>Response-time tracking</span><span>Flow decay alerts</span></div>
+        </div>
+      </div>
+      <div class="srow reveal">
+        <div class="si">03</div>
+        <div>
+          <h3>Open follow-up tracking</h3>
+          <p>"Will confirm by 10", "let me check and revert" — every implicit commitment is detected and tracked as an open item until it's closed, so nothing slips between a busy desk and the next trade.</p>
+          <div class="meta"><span>Auto-detected commitments</span><span>Ageing alerts</span><span>Desk &amp; individual views</span></div>
+        </div>
+      </div>
+      <div class="srow reveal">
+        <div class="si">04</div>
+        <div>
+          <h3>Sentiment &amp; tone analysis</h3>
+          <p>Score the tone of client and counterparty conversations over time. Surface mounting frustration, momentum shifts and at-risk relationships early enough to do something about them.</p>
+          <div class="meta"><span>Per-relationship trend</span><span>Escalation signals</span><span>ML-driven</span></div>
+        </div>
+      </div>
+      <div class="srow reveal">
+        <div class="si">05</div>
+        <div>
+          <h3>Unified search &amp; export</h3>
+          <p>Query every conversation across chat, email and voice in one place, then export a structured slice — by desk, person, counterparty, instrument or date — to your BI tools, data warehouse or a board pack.</p>
+          <div class="meta"><span>Cross-channel search</span><span>API &amp; CSV export</span><span>BI-ready</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:36px" class="reveal"><a href="index.html#intelligence" class="btn btn-solid">See the live dashboard →</a></div>
+  </div>
+</section>
 
-1. **Custom HTML blocks (fastest).** In the Bitrix24 site editor, add an
-   *Embed / HTML* block to each page and paste the contents of the matching
-   `<body>`. Then add the contents of `chatguard.css` once under
-   *Site settings → CSS* (or a site-wide HTML block in `<style>` tags), and
-   `chatguard.js` under *site-wide JavaScript*. Load the three Google Fonts
-   (Fraunces, Archivo, JetBrains Mono) in the head/embed too. Because the CSS
-   and JS are shared, you paste them once, not per page.
+<!-- COMPLIANCE & HR -->
+<section id="compliance" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow green">Service line 02 · Compliance &amp; HR</span>
+      <h2>Prove conduct. Protect the firm.</h2>
+      <p>For compliance officers, HR teams and business owners at regulated firms. The surveillance, archiving and investigation tooling you need to meet your obligations — and demonstrate that you have.</p>
+    </div>
+    <div class="fgrid">
+      <div class="fcard reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/></svg></div><div class="tagline">Archiving</div><h4>Immutable archive &amp; retrieval</h4><p>Every message retained 5+ years, tamper-evident and timestamped. Reconstruct any thread for an audit or legal request in seconds.</p></div>
+      <div class="fcard reveal" style="transition-delay:.05s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v6m0 0 3-3m-3 3L9 5M5 13a7 7 0 0 0 14 0"/></svg></div><div class="tagline">Surveillance</div><h4>Keyword &amp; pattern alerts</h4><p>Custom alerts flag market abuse, off-channel talk and misconduct. Machine learning surfaces patterns of behaviour humans miss.</p></div>
+      <div class="fcard reveal" style="transition-delay:.1s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M5 4h14v16l-7-3-7 3z"/></svg></div><div class="tagline">Governance</div><h4>Policy enforcement</h4><p>Hold conversations to your internal policies automatically, with educational nudges that reduce repeat breaches over time.</p></div>
+      <div class="fcard reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h8"/></svg></div><div class="tagline">Reporting</div><h4>One-click regulator reports</h4><p>Generate audit packs for the FCA, FINRA or internal review on demand — the evidence assembled and formatted for you.</p></div>
+      <div class="fcard reveal" style="transition-delay:.05s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></div><div class="tagline">Human Resources</div><h4>HR investigation toolkit</h4><p>Pull a full, documented evidence trail for a person or period. Identify recurring issues and intervene before they escalate.</p></div>
+      <div class="fcard reveal" style="transition-delay:.1s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></div><div class="tagline">Oversight</div><h4>Compliance dashboard</h4><p>One console for reviewers with role-based permissions, case management and a complete record of who reviewed what, when.</p></div>
+    </div>
+    <div style="margin-top:36px" class="reveal"><a href="index.html#compliance" class="btn btn-green">Explore compliance features →</a></div>
+  </div>
+</section>
 
-2. **Host the static files and link out.** These pages are fully self-contained
-   and can be hosted on any static host (or the existing `monitoring.chatguard.co`
-   infra) with the Bitrix24 nav linking to them. Lowest-friction if you want to
-   keep the design exactly as-is.
+<!-- DEPLOYMENT -->
+<section style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Service line 03 · Deployment &amp; support</span>
+      <h2>Stood up your way, supported by people who know the space.</h2>
+    </div>
+    <div class="bgrid">
+      <div class="bcard reveal"><div class="bnum">Aa</div><h3>Self-host or private cloud</h3><p>Run ChatGuard inside your own data centre or a private cloud tenancy. Your data never has to leave your perimeter.</p></div>
+      <div class="bcard reveal" style="transition-delay:.05s"><div class="bnum">Bb</div><h3>Onboarding &amp; configuration</h3><p>We connect your Bloomberg, email and voice feeds, tune alert rules to your policies and migrate historical archives.</p></div>
+      <div class="bcard reveal" style="transition-delay:.1s"><div class="bnum">Cc</div><h3>Direct support</h3><p>A responsive team with legal, compliance and markets experience — local-currency billing and a single point of contact.</p></div>
+    </div>
+  </div>
+</section>
 
-If you have developer access to the Bitrix24 template, the cleanest long-term
-option is to move the nav/footer markup into the template header/footer include
-and keep each page's `<main>` as the editable region.
+<!-- CTA -->
+<section id="contact">
+  <div class="wrap">
+    <div class="cta reveal">
+      <h2>Map these services to your firm.</h2>
+      <p>Tell us your channels and your obligations — we'll show you exactly which service lines fit and what it takes to deploy.</p>
+      <div class="cta-btns">
+        <a href="tel:+442039667807" class="btn btn-solid">Call +44 20 3966 7807</a>
+        <a href="mailto:info@chatguard.co" class="btn btn-ghost">info@chatguard.co</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-## Before publishing — please check
-- **Illustrative data:** the dashboard figures and counterparty names
-  (Meridian Cap, Northbridge, etc.) are placeholders. Swap for real or clearly
-  fictional examples.
-- **FCA stats** (£52.8m fines, 1,266 firms cancelled in 2023) came from the
-  original site copy — re-verify against current FCA figures before relying on them.
-- **Legal:** employee-communications monitoring carries GDPR/employment-law
-  obligations; the footer disclaimer is a placeholder, not legal advice.
-- Confirm the `monitoring.chatguard.co`, LinkedIn, privacy/cookie/FAQ links.
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:18px"><span class="mark"></span>Chat<b>Guard</b></a>
+        <p style="max-width:280px">The ultimate compliance chat monitoring &amp; desk-intelligence platform.</p>
+        <p class="mono" style="color:var(--fg-faint);margin-top:10px">A product of Axtrade Capital</p>
+      </div>
+      <div><h5>Platform</h5><a href="services.html">Services</a><a href="services.html#intelligence">Desk Intelligence</a><a href="services.html#compliance">Compliance &amp; HR</a><a href="index.html#security">Security</a><a href="https://monitoring.chatguard.co">Log in</a></div>
+      <div><h5>Company</h5><a href="benefits.html">Benefits</a><a href="industries.html">Industries</a><a href="index.html#channels">Channels</a><a href="index.html#contact">Contact</a><a href="https://www.linkedin.com/company/100678182/">LinkedIn</a></div>
+      <div><h5>Offices</h5><p class="office"><b>United Kingdom</b>67 Redcliffe Gardens, SW10 9JJ London</p><p class="office"><b>France</b>35 Rue Cler, 75007 Paris</p><p class="office"><b>USA</b>111 Congress Ave, Suite 500, Austin, TX 78701</p></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 ChatGuard. All rights reserved.</span>
+      <span style="display:flex;gap:20px"><a href="https://www.chatguard.co/privacypolicy/">Privacy Policy</a><a href="https://www.chatguard.co/cookiepolicy/">Cookie Policy</a><a href="https://www.chatguard.co/FAQS/">FAQ</a></span>
+    </div>
+    <p class="disclaimer">ChatGuard provides communications surveillance and analytics tooling. Monitoring of employee communications must be carried out in line with applicable employment, data-protection and privacy laws (including UK GDPR). ChatGuard does not provide legal advice.</p>
+  </div>
+</footer>
+
+<script src="chatguard.js"></script>
+</body>
+</html>
