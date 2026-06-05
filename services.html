@@ -1,0 +1,52 @@
+# ChatGuard site — build notes
+
+A four-page static site on one shared design system.
+
+```
+chatguard-site/
+├── index.html          Home (hero, two engines, extraction, compliance, channels, security)
+├── services.html       Desk Intelligence + Compliance/HR + Deployment service lines
+├── benefits.html       Why-us + dual outcome panels + risk stats
+├── industries.html     Financial-sector accordion + other sectors
+└── assets/
+    ├── chatguard.css   ALL styling, both themes (dark default + light)
+    └── chatguard.js    Theme toggle (persisted), scroll reveals, stat counters
+```
+
+## Themes
+Light/dark is driven entirely by CSS variables. The toggle in the nav sets
+`data-theme="light"` on `<html>` and saves the choice to `localStorage` (key
+`cg-theme`), so it persists across pages and visits. Remove the toggle button
+to lock a single theme, or set `<html data-theme="light">` to default to light.
+The Bloomberg terminal and dashboard mock-ups stay dark in both themes by design.
+
+## Putting it into Bitrix24
+Bitrix24's site builder doesn't import raw HTML pages directly, so there are two
+realistic routes:
+
+1. **Custom HTML blocks (fastest).** In the Bitrix24 site editor, add an
+   *Embed / HTML* block to each page and paste the contents of the matching
+   `<body>`. Then add the contents of `chatguard.css` once under
+   *Site settings → CSS* (or a site-wide HTML block in `<style>` tags), and
+   `chatguard.js` under *site-wide JavaScript*. Load the three Google Fonts
+   (Fraunces, Archivo, JetBrains Mono) in the head/embed too. Because the CSS
+   and JS are shared, you paste them once, not per page.
+
+2. **Host the static files and link out.** These pages are fully self-contained
+   and can be hosted on any static host (or the existing `monitoring.chatguard.co`
+   infra) with the Bitrix24 nav linking to them. Lowest-friction if you want to
+   keep the design exactly as-is.
+
+If you have developer access to the Bitrix24 template, the cleanest long-term
+option is to move the nav/footer markup into the template header/footer include
+and keep each page's `<main>` as the editable region.
+
+## Before publishing — please check
+- **Illustrative data:** the dashboard figures and counterparty names
+  (Meridian Cap, Northbridge, etc.) are placeholders. Swap for real or clearly
+  fictional examples.
+- **FCA stats** (£52.8m fines, 1,266 firms cancelled in 2023) came from the
+  original site copy — re-verify against current FCA figures before relying on them.
+- **Legal:** employee-communications monitoring carries GDPR/employment-law
+  obligations; the footer disclaimer is a placeholder, not legal advice.
+- Confirm the `monitoring.chatguard.co`, LinkedIn, privacy/cookie/FAQ links.

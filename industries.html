@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatGuard — Bloomberg Chat Intelligence & Compliance</title>
+<meta name="description" content="ChatGuard turns Bloomberg chat and email archives into compliance-grade records and desk intelligence. Built for Axtrade Capital and regulated firms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/chatguard.css">
+</head>
+<body>
+
+<header id="hdr">
+  <nav>
+    <a href="index.html" class="logo"><span class="mark"></span>Chat<b>Guard</b></a>
+    <div class="navlinks">
+      <a href="services.html">Services</a>
+      <a href="benefits.html">Benefits</a>
+      <a href="industries.html">Industries</a>
+      <a href="#channels">Channels</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+      </button>
+      <a href="https://monitoring.chatguard.co" class="btn btn-ghost">Log in</a>
+      <a href="#contact" class="btn btn-solid">Book a demo</a>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow reveal">Bloomberg chat · email · voice surveillance</span>
+      <h1 class="reveal" style="transition-delay:.05s">Turn your chat archive into <span class="em">desk intelligence</span> — and audit-ready <span class="em g">compliance</span>.</h1>
+      <p class="sub reveal" style="transition-delay:.12s">ChatGuard captures, archives and analyses every Bloomberg chat, email and call across your firm. We give Axtrade's desks the signals buried in their conversations — and give compliance &amp; HR teams the evidence they need to protect the firm.</p>
+      <div class="hero-cta reveal" style="transition-delay:.18s">
+        <a href="services.html" class="btn btn-solid">Explore the platform →</a>
+        <a href="#engines" class="btn btn-green">See the two engines</a>
+      </div>
+      <div class="trust reveal" style="transition-delay:.24s">
+        <div><span class="dot"></span>5-year retention, FCA / FINRA aligned</div>
+        <div><span class="dot"></span>End-to-end encrypted</div>
+        <div><span class="dot"></span>Self-host or private cloud</div>
+      </div>
+    </div>
+
+    <div class="reveal" style="transition-delay:.15s">
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span>IB-CHAT · DESK FX-RATES · LIVE CAPTURE</span>
+        </div>
+        <div class="term-body">
+          <div class="chat-line"><span class="who">09:41 JM</span><span class="msg">Looking for 25m EUR/USD spot, where are you?<span class="tag rfq">RFQ DETECTED</span></span></div>
+          <div class="chat-line"><span class="who">09:41 DESK</span><span class="msg">1.0842 / 1.0844, can do 25 your side<span class="tag cp">QUOTE</span></span></div>
+          <div class="chat-line"><span class="who">09:42 JM</span><span class="msg">done at 44, thanks — counterparty Meridian Cap<span class="tag cp">COUNTERPARTY</span></span></div>
+          <div class="chat-line"><span class="who">09:44 RT</span><span class="msg">keep this off the record between us ok?<span class="tag alert">POLICY FLAG</span></span></div>
+          <div class="chat-line"><span class="who">09:45 DESK</span><span class="msg">will send confirm by 10. follow up on the 50m swap<span class="tag rfq">OPEN FOLLOW-UP</span></span></div>
+        </div>
+        <div class="term-foot">
+          <span class="pulse">capturing · 1,284 msgs today</span>
+          <span>3 RFQ · 1 flag · 0 dropped</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="wrap">
+    <div class="stat reveal"><div class="num red" data-count="52.8" data-prefix="£" data-suffix="M">£0</div><div class="lbl">FCA fines imposed in 2023 for compliance failures</div></div>
+    <div class="stat reveal" style="transition-delay:.07s"><div class="num red" data-count="1266">0</div><div class="lbl">UK firms cancelled by the FCA in 10 months — double the prior year</div></div>
+    <div class="stat reveal" style="transition-delay:.14s"><div class="num amber" data-count="5">0</div><div class="lbl">Years minimum retention, enforced automatically</div></div>
+    <div class="stat reveal" style="transition-delay:.21s"><div class="num green" data-count="100" data-suffix="%">0</div><div class="lbl">Of messages captured — zero gaps, fully timestamped</div></div>
+  </div>
+</div>
+
+<!-- TWO ENGINES -->
+<section id="engines">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">One platform · two jobs</span>
+      <h2>The same captured data does two things at once.</h2>
+      <p>Most surveillance tools treat your archive as a liability you store and forget. ChatGuard runs two engines on top of the exact same encrypted record — one that makes your desks faster, one that keeps the firm safe.</p>
+    </div>
+    <div class="engines">
+      <div class="engine amber reveal">
+        <div class="glow"></div>
+        <span class="badge">For Axtrade · internal</span>
+        <h3>Desk Intelligence</h3>
+        <div class="who-for">Traders · desk heads · COO</div>
+        <p>Extract the signal inside every Bloomberg conversation and turn it into productivity — not just an archive box you tick.</p>
+        <ul class="elist">
+          <li><span class="ic">→</span><span><b>RFQ &amp; quote extraction.</b> <span>Structure requests, quotes and fills from free-text chat into a searchable book.</span></span></li>
+          <li><span class="ic">→</span><span><b>Counterparty intelligence.</b> <span>Response times, hit rates and where flow is leaking.</span></span></li>
+          <li><span class="ic">→</span><span><b>Open follow-up tracking.</b> <span>Open threads surface until they're closed.</span></span></li>
+          <li><span class="ic">→</span><span><b>Sentiment &amp; tone analysis.</b> <span>Spot strained relationships and momentum shifts early.</span></span></li>
+        </ul>
+        <div style="margin-top:24px"><a href="services.html#intelligence" class="btn btn-solid">Desk intelligence services →</a></div>
+      </div>
+      <div class="engine green reveal" style="transition-delay:.08s">
+        <div class="glow"></div>
+        <span class="badge">For clients · external</span>
+        <h3>Compliance &amp; HR</h3>
+        <div class="who-for">Compliance officers · HR · business owners</div>
+        <p>Everything a regulated firm needs to archive, monitor and prove conduct — without an army of reviewers.</p>
+        <ul class="elist">
+          <li><span class="ic">✓</span><span><b>Immutable archiving.</b> <span>Retained 5+ years, tamper-evident and timestamped for audit.</span></span></li>
+          <li><span class="ic">✓</span><span><b>Keyword &amp; policy alerts.</b> <span>Flag market abuse, off-channel talk and misconduct instantly.</span></span></li>
+          <li><span class="ic">✓</span><span><b>HR investigation toolkit.</b> <span>A full evidence trail for a person or period in seconds.</span></span></li>
+          <li><span class="ic">✓</span><span><b>One-click regulator reports.</b> <span>Audit packs for the FCA, FINRA or internal review.</span></span></li>
+        </ul>
+        <div style="margin-top:24px"><a href="services.html#compliance" class="btn btn-green">Compliance &amp; HR services →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXTRACTION DEEP DIVE -->
+<section id="intelligence" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow amber">Desk intelligence · how extraction works</span>
+      <h2>From raw chatter to a structured trading record.</h2>
+      <p>Bloomberg chat is unstructured, fast and full of shorthand. ChatGuard reads it the way a desk does — and writes it back as clean, queryable data.</p>
+    </div>
+    <div class="extract">
+      <div class="pipe">
+        <div class="pipe-step reveal"><span class="n">01</span><div><h4>Capture</h4><p>Ingest IB chat, persistent rooms, email and voice in real time — nothing leaves your perimeter.</p></div></div>
+        <div class="pipe-step reveal" style="transition-delay:.06s"><span class="n">02</span><div><h4>Parse &amp; classify</h4><p>NLP tuned for trading shorthand tags RFQs, quotes, fills, counterparties, tickers and instructions.</p></div></div>
+        <div class="pipe-step reveal" style="transition-delay:.12s"><span class="n">03</span><div><h4>Enrich</h4><p>Link messages to counterparties, desks and instruments; score sentiment and urgency.</p></div></div>
+        <div class="pipe-step reveal" style="transition-delay:.18s"><span class="n">04</span><div><h4>Surface</h4><p>Push it to a live dashboard, search, alerts and exportable reports — for the desk and for compliance.</p></div></div>
+      </div>
+      <div class="dash reveal" style="transition-delay:.1s">
+        <div class="dash-top"><span class="t">DESK INTELLIGENCE · FX-RATES · TODAY</span><span class="live">● LIVE</span></div>
+        <div class="dash-cards">
+          <div class="dcard"><div class="k">RFQs captured</div><div class="v am">47</div><div class="d up">▲ 12 vs avg</div></div>
+          <div class="dcard"><div class="k">Hit rate</div><div class="v">38%</div><div class="d up">▲ 4 pts</div></div>
+          <div class="dcard"><div class="k">Open follow-ups</div><div class="v">6</div><div class="d dn">2 ageing &gt; 1h</div></div>
+        </div>
+        <div class="dash-list">
+          <div class="drow"><span class="pill r">RFQ</span><span class="txt">25m EUR/USD spot — Meridian Cap</span><span class="tm">09:41</span></div>
+          <div class="drow"><span class="pill c">FILL</span><span class="txt">Done @ 1.0844 · confirm pending</span><span class="tm">09:42</span></div>
+          <div class="drow"><span class="pill a">FLAG</span><span class="txt">"keep this off the record" — review</span><span class="tm">09:44</span></div>
+          <div class="drow"><span class="pill r">OPEN</span><span class="txt">50m EUR swap — awaiting client</span><span class="tm">09:45</span></div>
+          <div class="drow"><span class="pill c">CPTY</span><span class="txt">Northbridge — 3-day silence, ↓ flow</span><span class="tm">10:02</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPLIANCE & HR FEATURES -->
+<section id="compliance" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow green">For external clients · compliance &amp; HR</span>
+      <h2>Protect the firm. Prove the conduct. Help the people.</h2>
+      <p>Give compliance officers, HR and owners cutting-edge tooling to meet their legal obligations and act early — without drowning in logs.</p>
+    </div>
+    <div class="fgrid">
+      <div class="fcard reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/></svg></div><h4>Real-time monitoring</h4><p>Instant visibility into every channel, so violations are caught as they happen.</p></div>
+      <div class="fcard reveal" style="transition-delay:.05s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg></div><h4>User-friendly dashboard</h4><p>One console with per-user permissions and full audit trails.</p></div>
+      <div class="fcard reveal" style="transition-delay:.1s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v6m0 0 3-3m-3 3L9 5M5 13a7 7 0 0 0 14 0"/></svg></div><h4>Keyword &amp; sentiment alerts</h4><p>Flag sensitive content and conduct risk; ML surfaces patterns humans miss.</p></div>
+      <div class="fcard reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M5 4h14v16l-7-3-7 3z"/></svg></div><h4>Policy enforcement</h4><p>Automatically hold conversations to your policies and protect your reputation.</p></div>
+      <div class="fcard reveal" style="transition-delay:.05s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/></svg></div><h4>Archive &amp; instant retrieval</h4><p>Search five years of conversation in seconds; reconstruct any thread.</p></div>
+      <div class="fcard reveal" style="transition-delay:.1s"><div class="ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h8"/></svg></div><h4>HR investigations &amp; evidence</h4><p>Capture conduct as documented evidence and intervene before issues escalate.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHANNELS -->
+<section id="channels" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Coverage</span>
+      <h2>Every channel your people actually use.</h2>
+      <p>One record across all communication, so there are no blind spots — and no off-channel surprises.</p>
+    </div>
+    <div class="channels">
+      <div class="chan primary reveal"><span class="lbl">Primary</span><h4>Bloomberg Chat</h4><p>IB chat &amp; persistent rooms, archived, monitored and mined for desk intelligence in real time.</p></div>
+      <div class="chan reveal" style="transition-delay:.05s"><span class="lbl">Email</span><h4>Corporate email</h4><p>Full capture for GDPR, FCA and FINRA obligations — a defensible record for any investigation.</p></div>
+      <div class="chan reveal" style="transition-delay:.1s"><span class="lbl">Voice</span><h4>Call recording</h4><p>Recorded, transcribed and searchable alongside text so the full conversation is one timeline.</p></div>
+      <div class="chan reveal" style="transition-delay:.15s"><span class="lbl">More</span><h4>Other channels</h4><p>Messaging platforms and bespoke systems — if your people use it, talk to us about covering it.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section id="security" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="secband reveal">
+      <span class="eyebrow green">Security &amp; data residency</span>
+      <h2 style="font-family:var(--display);font-weight:600;font-size:clamp(26px,3.2vw,38px);letter-spacing:-.02em;margin-top:16px;max-width:620px;line-height:1.1">Your most sensitive data, stored the way you demand.</h2>
+      <div class="secgrid">
+        <div class="sitem"><h4>Encrypted end-to-end</h4><p>All data encrypted at rest and in transit across the full pipeline.</p></div>
+        <div class="sitem"><h4>Your data centre</h4><p>Self-host or run in your private cloud — data never has to leave your perimeter.</p></div>
+        <div class="sitem"><h4>IP allow-listing</h4><p>Restrict web access to approved IP ranges and named users only.</p></div>
+        <div class="sitem"><h4>Granular permissions</h4><p>Role-based access so only authorised reviewers ever see a log.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact">
+  <div class="wrap">
+    <div class="cta reveal">
+      <h2>See what your conversations have been telling you.</h2>
+      <p>Book a walkthrough of ChatGuard on your own Bloomberg and email data — desk intelligence for your traders, compliance cover for your firm.</p>
+      <div class="cta-btns">
+        <a href="tel:+442039667807" class="btn btn-solid">Call +44 20 3966 7807</a>
+        <a href="mailto:info@chatguard.co" class="btn btn-ghost">info@chatguard.co</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:18px"><span class="mark"></span>Chat<b>Guard</b></a>
+        <p style="max-width:280px">The ultimate compliance chat monitoring &amp; desk-intelligence platform. Archive, monitor and analyse every channel — and put the data to work.</p>
+        <p class="mono" style="color:var(--fg-faint);margin-top:10px">A product of Axtrade Capital</p>
+      </div>
+      <div><h5>Platform</h5><a href="services.html">Services</a><a href="services.html#intelligence">Desk Intelligence</a><a href="services.html#compliance">Compliance &amp; HR</a><a href="#security">Security</a><a href="https://monitoring.chatguard.co">Log in</a></div>
+      <div><h5>Company</h5><a href="benefits.html">Benefits</a><a href="industries.html">Industries</a><a href="#channels">Channels</a><a href="#contact">Contact</a><a href="https://www.linkedin.com/company/100678182/">LinkedIn</a></div>
+      <div><h5>Offices</h5><p class="office"><b>United Kingdom</b>67 Redcliffe Gardens, SW10 9JJ London</p><p class="office"><b>France</b>35 Rue Cler, 75007 Paris</p><p class="office"><b>USA</b>111 Congress Ave, Suite 500, Austin, TX 78701</p></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 ChatGuard. All rights reserved.</span>
+      <span style="display:flex;gap:20px"><a href="https://www.chatguard.co/privacypolicy/">Privacy Policy</a><a href="https://www.chatguard.co/cookiepolicy/">Cookie Policy</a><a href="https://www.chatguard.co/FAQS/">FAQ</a></span>
+    </div>
+    <p class="disclaimer">ChatGuard provides communications surveillance and analytics tooling. Monitoring of employee communications must be carried out in line with applicable employment, data-protection and privacy laws (including UK GDPR). ChatGuard does not provide legal advice.</p>
+  </div>
+</footer>
+
+<script src="assets/chatguard.js"></script>
+</body>
+</html>
