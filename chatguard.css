@@ -112,8 +112,8 @@ nav{display:flex;align-items:center;justify-content:space-between;height:70px;ma
 .nav-cta{display:flex;gap:12px;align-items:center}
 .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:600;font-size:14px;
   padding:11px 20px;border-radius:9px;cursor:pointer;border:1px solid transparent;transition:.2s;white-space:nowrap}
-.btn-ghost{border-color:var(--line-2);color:var(--fg)}
-.btn-ghost:hover{background:var(--panel-2);border-color:var(--fg-faint)}
+.btn-ghost{background:var(--panel-2);border-color:var(--line-2);color:var(--fg)}
+.btn-ghost:hover{border-color:var(--fg-faint);filter:brightness(1.08)}
 .btn-solid{background:var(--amber);color:var(--btn-amber-fg);font-weight:700}
 .btn-solid:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .btn-green{background:var(--green);color:var(--btn-green-fg);font-weight:700}
