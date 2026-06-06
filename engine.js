@@ -1,5 +1,16 @@
-// ChatGuard extraction engine (server module).
-// Pure functions — same logic as the in-browser demo, no DOM dependency.
+/**
+ * ChatGuard — extraction engine (server module)
+  *
+   * Copyright (c) 2024–2026 AXTRADE SAS. All rights reserved.
+    *
+     * PROPRIETARY AND CONFIDENTIAL
+      * This file is part of the ChatGuard software suite owned by AXTRADE SAS.
+       * Unauthorised copying, modification, distribution, or use of this file,
+        * via any medium, is strictly prohibited without the prior written consent
+         * of AXTRADE SAS.
+          *
+           * For licensing enquiries: legal@chatguard.co
+            */
 
 function parseT(t){if(!t)return null;const p=String(t).split(":").map(Number);return p[0]*3600+p[1]*60+(p[2]||0);}
 function fmtDur(s){if(s==null||s<0)return null;return s;} // seconds (numeric) for API consumers
