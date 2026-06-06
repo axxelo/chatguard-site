@@ -1,7 +1,16 @@
-// ChatGuard — reference extraction API (Express).
-// A runnable backend that exposes the extraction engine over HTTP.
-// In production the same engine sits behind a queue fed by Bloomberg/email/voice
-// capture (see ../BACKEND-INTEGRATION.md). Storage here is in-memory for the demo.
+/**
+ * ChatGuard — reference extraction API (Express server)
+  *
+   * Copyright (c) 2024–2026 AXTRADE SAS. All rights reserved.
+    *
+     * PROPRIETARY AND CONFIDENTIAL
+      * This file is part of the ChatGuard software suite owned by AXTRADE SAS.
+       * Unauthorised copying, modification, distribution, or use of this file,
+        * via any medium, is strictly prohibited without the prior written consent
+         * of AXTRADE SAS.
+          *
+           * For licensing enquiries: legal@chatguard.co
+            */
 
 const express = require("express");
 const { extract } = require("./engine");
