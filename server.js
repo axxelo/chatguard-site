@@ -5,6 +5,7 @@
 
 const express = require("express");
 const { extract } = require("./engine");
+const { notifySlack, buildSlackMessage } = require("./alerts");
 
 const app = express();
 app.use(express.json({ limit: "2mb" }));
@@ -57,6 +58,8 @@ app.post("/api/ingest", (req, res) => {
   const batch = { id: "B" + (seq++), ts: new Date().toISOString(),
     source: req.body.source || "manual", desk: req.body.desk || null, result };
   batches.push(batch);
+  // fire-and-forget Slack alert for high-severity flags (no-op unless SLACK_WEBHOOK_URL is set)
+  notifySlack(result, { batchId: batch.id, source: batch.source, desk: batch.desk }).catch(() => {});
   res.status(201).json({ id: batch.id, ts: batch.ts, stats: result.stats });
 });
 
@@ -86,6 +89,12 @@ app.get("/api/flags", (req, res) => {
   res.json(f);
 });
 app.get("/api/typologies", (_req, res) => res.json(aggregate().typologies));
+app.post("/api/alerts/preview", (req, res) => {
+  const text = req.body.transcript || req.body.text || "";
+  if (!text.trim()) return res.status(400).json({ error: "Provide 'transcript' (string)." });
+  const msg = buildSlackMessage(extract(text), { source: req.body.source, desk: req.body.desk });
+  res.json(msg || { note: "No high-severity flags — no alert would be sent." });
+});
 app.get("/api/report", (_req, res) => {
   const a = aggregate();
   res.json({
