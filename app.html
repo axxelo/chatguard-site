@@ -385,7 +385,45 @@ function show(view){
 document.getElementById("nav").addEventListener("click",e=>{const a=e.target.closest("a[data-view]");if(a)show(a.dataset.view);});
 document.getElementById("toggle").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const e2=b.dataset.e;show(e2==="desk"?"desk":e2==="compliance"?"comp":"overview");});
 function flash(msg){const f=$("flash");f.textContent=msg;f.classList.add("show");setTimeout(()=>f.classList.remove("show"),2600);}
-document.getElementById("auditBtn").addEventListener("click",()=>flash("Audit pack queued — "+R.stats.flags+" flags, "+R.stats.deals+" deals exported (demo)"));
+function auditReportHTML(){
+  var s=R.stats, gen=new Date().toLocaleString();
+  var typo=Object.entries(R.typologies).map(function(e){return "<tr><td>"+esc(e[0])+"</td><td>"+e[1]+"</td></tr>";}).join("");
+  var flags=R.flags.map(function(f){return "<tr><td>"+esc(f.time)+"</td><td>"+esc(f.sender)+"</td><td class='sev "+f.sev+"'>"+f.sev+"</td><td>"+esc(f.typology)+"</td><td>"+esc(f.body)+"</td></tr>";}).join("");
+  var deals=R.deals.map(function(d){return "<tr><td>"+d.id+"</td><td>"+(esc(d.inst)||"—")+"</td><td>"+(esc(d.assetClass)||"—")+"</td><td>"+(esc(d.size)||"—")+"</td><td>"+d.status+"</td><td>"+(esc(d.fillPrice||d.quotePrice)||"—")+"</td><td>"+(esc(d.cp)||"—")+"</td></tr>";}).join("");
+  var cps=R.counterparties.map(function(c){return "<tr><td>"+esc(c.name)+"</td><td>"+c.aliases.map(esc).join(", ")+"</td><td>"+c.mentions+"</td></tr>";}).join("");
+  var css="body{font-family:Arial,Helvetica,sans-serif;color:#0F1420;margin:32px;font-size:12px}"+
+    "h1{font-size:24px;margin:0}h2{font-size:15px;margin:22px 0 8px;border-bottom:2px solid #0F1420;padding-bottom:4px}"+
+    ".sub{color:#5B6577;margin:2px 0 14px}table{width:100%;border-collapse:collapse;margin-top:6px}"+
+    "th{background:#0F1420;color:#fff;text-align:left;padding:6px 8px;font-size:11px}td{padding:6px 8px;border-bottom:1px solid #D7DCE5;vertical-align:top}"+
+    "tr:nth-child(even) td{background:#F6F8FB}.kpis{display:flex;gap:10px;margin:10px 0}"+
+    ".kpi{flex:1;border:1px solid #D7DCE5;border-radius:8px;padding:10px}.kpi b{font-size:20px;display:block}"+
+    ".sev{font-weight:bold;text-transform:uppercase}.sev.high{color:#C0392B}.sev.medium{color:#B8731A}.sev.low{color:#5B6577}"+
+    ".amber{color:#B8731A}.green{color:#1E9E73}.red{color:#C0392B}.meta{color:#5B6577}.disc{color:#5B6577;font-size:10px;margin-top:10px}"+
+    "@media print{.noprint{display:none}}";
+  return "<!doctype html><html><head><meta charset='utf-8'><title>ChatGuard Audit Pack</title><style>"+css+"</style></head><body>"+
+    "<h1>ChatGuard</h1><div class='sub'>Communications Surveillance — Audit Pack &nbsp;·&nbsp; A product of AXTRADE SAS</div>"+
+    "<table style='width:auto'><tr><td class='meta'>Client</td><td><b>Meridian Securities</b></td><td class='meta'>&nbsp;&nbsp;Reference</td><td><b>CG-AUD-2026-0601</b></td></tr>"+
+    "<tr><td class='meta'>Channels</td><td><b>Bloomberg IB chat</b></td><td class='meta'>&nbsp;&nbsp;Generated</td><td><b>"+gen+"</b></td></tr></table>"+
+    "<h2>Executive summary</h2><div class='kpis'>"+
+    "<div class='kpi'><b>"+s.messages+"</b>Messages</div><div class='kpi'><b class='amber'>"+s.deals+"</b>Deals</div>"+
+    "<div class='kpi'><b class='amber'>"+s.filled+"</b>Filled</div><div class='kpi'><b class='green'>"+s.flags+"</b>Flags</div>"+
+    "<div class='kpi'><b class='red'>"+(s.highFlags||0)+"</b>High</div></div>"+
+    "<h2>Flags by market-abuse typology</h2><table><tr><th>Typology</th><th>Count</th></tr>"+typo+"</table>"+
+    "<h2>Flagged messages — evidence</h2><table><tr><th>Time</th><th>From</th><th>Sev</th><th>Typology</th><th>Message</th></tr>"+flags+"</table>"+
+    "<h2>Reconstructed deals</h2><table><tr><th>ID</th><th>Instrument</th><th>Class</th><th>Size</th><th>Status</th><th>Price</th><th>Counterparty</th></tr>"+deals+"</table>"+
+    "<h2>Counterparties (resolved)</h2><table><tr><th>Counterparty</th><th>Aliases</th><th>Mentions</th></tr>"+cps+"</table>"+
+    "<p class='disc'>Flags are indicators for human review, not determinations of wrongdoing. Generated from captured communications held in the client's perimeter. ChatGuard does not provide legal advice.</p>"+
+    "<p class='noprint' style='margin-top:18px'><button onclick='window.print()' style='padding:8px 14px;font-size:13px'>Print / Save as PDF</button></p>"+
+    "</body></html>";
+}
+function generateAudit(){
+  var w=window.open("","_blank");
+  if(!w){flash("Allow pop-ups to generate the audit pack");return;}
+  w.document.write(auditReportHTML());w.document.close();w.focus();
+  setTimeout(function(){try{w.print();}catch(e){}},500);
+  flash("Audit pack generated — "+R.stats.flags+" flags, "+R.stats.deals+" deals");
+}
+document.getElementById("auditBtn").addEventListener("click",generateAudit);
 
 async function init(){
   if(API_BASE){

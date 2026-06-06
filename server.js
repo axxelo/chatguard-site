@@ -86,6 +86,16 @@ app.get("/api/flags", (req, res) => {
   res.json(f);
 });
 app.get("/api/typologies", (_req, res) => res.json(aggregate().typologies));
+app.get("/api/report", (_req, res) => {
+  const a = aggregate();
+  res.json({
+    generatedAt: new Date().toISOString(),
+    title: "Communications Surveillance — Audit Pack",
+    product: "ChatGuard · AXTRADE SAS",
+    stats: a.stats, typologies: a.typologies,
+    flags: a.flags, deals: a.deals, counterparties: a.counterparties
+  });
+});
 app.get("/api/followups", (_req, res) => res.json(aggregate().followups));
 app.get("/api/counterparties", (_req, res) => res.json(aggregate().counterparties));
 app.get("/api/users", (_req, res) => res.json(aggregate().byUser));
