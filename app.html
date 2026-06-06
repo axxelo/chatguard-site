@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en" data-engine="overview">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChatGuard Console — monitoring.chatguard.co</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0E16; --panel:#0F1420; --panel-2:#161D2E; --panel-3:#1B2536;
+  --line:#1E2740; --line-2:#2A3658;
+  --fg:#EDEFF4; --fg-muted:#A7B0C4; --fg-faint:#6B7488;
+}
+:root{
+  --amber:#F2A93B; --amber-soft:rgba(242,169,59,.14);
+  --green:#37D6A0; --green-soft:rgba(55,214,160,.14);
+  --red:#FF6B6B; --red-soft:rgba(255,107,107,.13);
+  --accent:var(--amber); --accent-soft:var(--amber-soft);
+  --radius:14px; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+[data-engine="compliance"]{ --accent:var(--green); --accent-soft:var(--green-soft); }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:
+    radial-gradient(1100px 600px at 100% -10%, rgba(242,169,59,.05), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(55,214,160,.05), transparent 60%),
+    var(--ink);
+  color:var(--fg); font-family:'Archivo',system-ui,sans-serif;
+  font-size:14px; line-height:1.5;
+  display:grid; grid-template-columns:248px 1fr; min-height:100%;
+}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono)}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0}
+
+/* ---- sidebar ---- */
+.side{
+  border-right:1px solid var(--line); background:linear-gradient(180deg,var(--panel),rgba(15,20,32,.6));
+  display:flex; flex-direction:column; padding:18px 14px; position:sticky; top:0; height:100vh;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;font-family:'Fraunces',serif;font-size:18px;font-weight:600}
+.brand .mark{width:26px;height:26px;color:var(--fg)}
+.brand b{color:var(--accent);font-weight:600}
+.org{
+  display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:10px;padding:9px 11px;margin-bottom:16px;cursor:pointer
+}
+.org .ava{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--amber),var(--green));flex:none;display:grid;place-items:center;color:#06203a;font-weight:700;font-size:12px}
+.org .nm{font-weight:600;font-size:13px;line-height:1.1}
+.org .sub{color:var(--fg-faint);font-size:11px}
+.org .chev{margin-left:auto;color:var(--fg-faint)}
+.navlbl{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-faint);padding:14px 10px 6px}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;color:var(--fg-muted);font-weight:500;font-size:13.5px;cursor:pointer;transition:.13s}
+.nav a svg{width:17px;height:17px;flex:none;opacity:.85}
+.nav a:hover{background:var(--panel-2);color:var(--fg)}
+.nav a.active{background:var(--accent-soft);color:var(--fg)}
+.nav a.active svg{color:var(--accent);opacity:1}
+.nav a .badge{margin-left:auto;background:var(--red-soft);color:var(--red);font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:20px;font-weight:600}
+.side .user{margin-top:auto;display:flex;align-items:center;gap:10px;padding:10px;border-top:1px solid var(--line)}
+.side .user .ava{width:30px;height:30px;border-radius:50%;background:var(--panel-3);display:grid;place-items:center;font-weight:600;font-size:12px;color:var(--accent)}
+.side .user .nm{font-size:13px;font-weight:600;line-height:1.1}
+.side .user .sub{font-size:11px;color:var(--fg-faint)}
+
+/* ---- main ---- */
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{
+  display:flex;align-items:center;gap:16px;padding:16px 28px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;background:rgba(10,14,22,.82);backdrop-filter:blur(10px);z-index:5
+}
+.topbar h1{font-size:20px}
+.env{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;color:var(--green);background:var(--green-soft);border:1px solid rgba(55,214,160,.3);padding:4px 10px;border-radius:20px}
+.env .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(55,214,160,.2)}
+.toggle{margin-left:auto;display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.toggle button{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--fg-muted);background:none;border:0;padding:7px 13px;border-radius:7px;cursor:pointer;transition:.13s}
+.toggle button.on[data-e="desk"]{background:var(--amber-soft);color:var(--amber)}
+.toggle button.on[data-e="compliance"]{background:var(--green-soft);color:var(--green)}
+.toggle button.on[data-e="overview"]{background:var(--panel-3);color:var(--fg)}
+.search{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:var(--fg-faint);font-size:12.5px;min-width:220px}
+.search input{background:none;border:0;color:var(--fg);font-family:inherit;font-size:13px;outline:none;width:100%}
+
+.view{padding:24px 28px 60px}
+.view[hidden]{display:none}
+.viewhead{display:flex;align-items:baseline;gap:12px;margin:2px 0 18px}
+.viewhead h2{font-size:22px}
+.viewhead .c{color:var(--fg-faint);font-size:13px}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.kpi .k{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--fg-faint)}
+.kpi .v{font-family:'Fraunces',serif;font-size:30px;font-weight:600;margin-top:6px;line-height:1}
+.kpi .v small{font-size:15px;color:var(--fg-faint);font-family:var(--mono)}
+.kpi.amber .v{color:var(--amber)} .kpi.green .v{color:var(--green)} .kpi.red .v{color:var(--red)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1fr}}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.card>.h{display:flex;align-items:center;gap:9px;padding:14px 16px;border-bottom:1px solid var(--line);font-weight:600;font-size:13.5px}
+.card>.h .c{margin-left:auto;color:var(--fg-faint);font-weight:400;font-size:12px;font-family:var(--mono)}
+.card .pad{padding:14px 16px}
+.eng-d{color:var(--amber)} .eng-c{color:var(--green)}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-weight:600;color:var(--fg-faint);font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:9px 16px;border-bottom:1px solid var(--line)}
+td{padding:10px 16px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--panel-2)}
+.tag{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:6px;background:var(--panel-3);color:var(--fg-muted)}
+.st{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
+.st.filled{background:var(--green-soft);color:var(--green)} .st.quoted{background:var(--amber-soft);color:var(--amber)} .st.requested{background:var(--panel-3);color:var(--fg-muted)}
+.pill{font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;padding:2px 8px;border-radius:6px}
+.pill.high{background:var(--red-soft);color:var(--red)} .pill.medium{background:var(--amber-soft);color:var(--amber)} .pill.low{background:var(--panel-3);color:var(--fg-muted)}
+.pos{color:var(--green)} .neg{color:var(--red)} .neu{color:var(--fg-muted)}
+.snip{color:var(--fg-muted);max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* typology cards */
+.typo{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:14px 16px}
+.typo.high{border-left-color:var(--red)} .typo.med{border-left-color:var(--amber)}
+.typo .n{font-size:12.5px;color:var(--fg-muted);font-weight:600}
+.typo .v{font-family:'Fraunces',serif;font-size:26px;font-weight:600}
+.disc{margin-top:22px;font-size:11.5px;color:var(--fg-faint);border:1px dashed var(--line-2);border-radius:10px;padding:11px 14px}
+.btn{font-family:inherit;font-weight:600;font-size:12.5px;border-radius:9px;padding:8px 13px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--fg);cursor:pointer}
+.btn.acc{background:var(--accent);border-color:var(--accent);color:#06121f}
+.flash{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--panel-3);border:1px solid var(--line-2);padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none}
+.flash.show{opacity:1}
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g fill="currentColor"><path d="M24.0 19.5L24.0 3.0L32.68 15.01Z"/><path d="M27.18 20.82L38.85 9.15L36.5 23.78Z"/><path d="M28.5 24.0L45.0 24.0L32.99 32.68Z"/><path d="M27.18 27.18L38.85 38.85L24.22 36.5Z"/><path d="M24.0 28.5L24.0 45.0L15.32 32.99Z"/><path d="M20.82 27.18L9.15 38.85L11.5 24.22Z"/><path d="M19.5 24.0L3.0 24.0L15.01 15.32Z"/><path d="M20.82 20.82L9.15 9.15L23.78 11.5Z"/></g><circle cx="24" cy="24" r="3.2" style="fill:var(--amber)"/></svg>
+    Chat<b>Guard</b>
+  </div>
+
+  <div class="org" title="Switch workspace">
+    <div class="ava">MS</div>
+    <div><div class="nm">Meridian Securities</div><div class="sub">Tier 1 · 412 seats</div></div>
+    <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+
+  <div class="navlbl">Overview</div>
+  <nav class="nav" id="nav">
+    <a data-view="overview" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+    <div class="navlbl">Desk Intelligence</div>
+    <a data-view="desk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Deals &amp; flow</a>
+    <a data-view="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 21c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11a3 3 0 1 0-1-5.8"/></svg>Counterparties</a>
+    <a data-view="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg>Desk activity</a>
+    <div class="navlbl">Compliance &amp; HR</div>
+    <a data-view="comp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Surveillance<span class="badge" id="navAlerts">0</span></a>
+    <a data-view="archive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="4"/><path d="M5 8v12h14V8"/><path d="M10 12h4"/></svg>Archive &amp; search</a>
+  </nav>
+
+  <div class="user">
+    <div class="ava">AB</div>
+    <div><div class="nm">A. Beluche</div><div class="sub">Compliance admin</div></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <h1 id="ttl">Dashboard</h1>
+    <span class="env"><span class="dot"></span>In-perimeter · EU-West</span>
+    <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input placeholder="Search messages, users, counterparties…"></div>
+    <div class="toggle" id="toggle">
+      <button data-e="overview" class="on">Overview</button>
+      <button data-e="desk">Desk</button>
+      <button data-e="compliance">Compliance</button>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <section class="view" id="view-overview">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="h"><span class="eng-d">●</span> Recent deals <span class="c">Desk Intelligence</span></div>
+        <div style="overflow-x:auto"><table id="ovDeals"></table></div>
+      </div>
+      <div class="card">
+        <div class="h"><span class="eng-c">●</span> Surveillance alerts <span class="c" id="ovAlertC"></span></div>
+        <div style="overflow-x:auto"><table id="ovFlags"></table></div>
+      </div>
+    </div>
+    <div class="disc">Illustrative data — this console is running the ChatGuard extraction engine in-browser on a sample Bloomberg transcript. In production the same engine reads from your captured, encrypted archive inside your own perimeter.</div>
+  </section>
+
+  <!-- DESK -->
+  <section class="view" id="view-desk" hidden>
+    <div class="viewhead"><h2 class="eng-d">Deals &amp; flow</h2><span class="c">Reconstructed RFQ → quote → fill, with timing</span></div>
+    <div class="card"><div style="overflow-x:auto"><table id="deskDeals"></table></div></div>
+  </section>
+
+  <!-- COUNTERPARTIES -->
+  <section class="view" id="view-cp" hidden>
+    <div class="viewhead"><h2 class="eng-d">Counterparties</h2><span class="c">Resolved across aliases · mentions &amp; sentiment</span></div>
+    <div class="card"><div style="overflow-x:auto"><table id="cpTable"></table></div></div>
+  </section>
+
+  <!-- USERS -->
+  <section class="view" id="view-users" hidden>
+    <div class="viewhead"><h2 class="eng-d">Desk activity</h2><span class="c">Per-user messages, flags and tone</span></div>
+    <div class="card"><div style="overflow-x:auto"><table id="usTable"></table></div></div>
+  </section>
+
+  <!-- COMPLIANCE -->
+  <section class="view" id="view-comp" hidden>
+    <div class="viewhead"><h2 class="eng-c">Surveillance</h2><span class="c">Flags grouped by market-abuse typology</span></div>
+    <div class="grid3" id="typoCards" style="margin-bottom:18px"></div>
+    <div class="card">
+      <div class="h">Flagged messages <span class="c" id="compFlagC"></span><button class="btn acc" style="margin-left:12px" id="auditBtn">Generate audit pack</button></div>
+      <div style="overflow-x:auto"><table id="compFlags"></table></div>
+    </div>
+  </section>
+
+  <!-- ARCHIVE -->
+  <section class="view" id="view-archive" hidden>
+    <div class="viewhead"><h2 class="eng-c">Archive &amp; search</h2><span class="c">Immutable, tamper-evident · 5y+ retention</span></div>
+    <div class="card"><div style="overflow-x:auto"><table id="arTable"></table></div></div>
+  </section>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script>
+/* ===== extraction engine (same logic as backend/engine.js) ===== */
+function parseT(t){if(!t)return null;const p=String(t).split(":").map(Number);return p[0]*3600+p[1]*60+(p[2]||0);}
+function normSize(sz){if(!sz)return 0;const m=sz.match(/(\d+(?:\.\d+)?)\s?(k|m|mm|bn|yards?|mio|mln)?/i);if(!m)return 0;let n=parseFloat(m[1]);const u=(m[2]||"m").toLowerCase();if(u==="k")n*=0.001;else if(u==="bn"||u.startsWith("yard"))n*=1000;return n;}
+function extract(text){
+  const lines=String(text||"").split(/\r?\n/);
+  const SIZE=/\b(\d+(?:\.\d+)?)\s?(k|m|mm|bn|yards?|mio|mln)\b/i;
+  const FXPAIR=/\b([A-Z]{3}\/[A-Z]{3})\b/;const FXCONCAT=/\b(EUR|GBP|AUD|NZD|USD)(USD|JPY|CHF|CAD|GBP)\b/;
+  const TENOR=/\b(\d{1,2}\s?(?:y|yr|yrs|year|mo|mth))\b/i;const TWO_SIDED=/(\d+(?:\.\d+)?)\s?[\/\-]\s?(\d+(?:\.\d+)?)/;
+  const AT_PRICE=/(?:@|at)\s?(\d+(?:\.\d{2,6}))/i;const TICKER=/\$([A-Z]{1,5})\b/;
+  const EQ=["AAPL","MSFT","TSLA","AMZN","GOOGL","META","NVDA","SPX","ESTX","FTSE","DAX","NKY"];
+  const ASSET=[{cls:"FX",re:/[A-Z]{3}\/[A-Z]{3}|EURUSD|GBPUSD|USDJPY|AUDUSD|USDCHF|USDCAD/},{cls:"Metals",re:/\b(gold|xau|silver|xag|platinum|xpt)\b/i},{cls:"Energy",re:/\b(brent|wti|crude|nat\s?gas|natgas)\b/i},{cls:"Rates",re:/\b(\d{1,2}\s?(?:y|yr|yrs|year))\b|\bswap\b|\bbond\b|\bgilt\b|\btreasury\b|\bbund\b|\bjgb\b/i},{cls:"Equities",re:/\$[A-Z]{1,5}\b|\b(AAPL|MSFT|TSLA|AMZN|GOOGL|META|NVDA|SPX|FTSE|DAX)\b/}];
+  const KW={rfq:["looking for","looking","where are you","where r u","where you","px on","price on","level on","can you make","make me","show me","rfq","quote on","mid on","axe","interest in","what's your","whats your","where do you","where's","can i get","need a price","where can you pay","where can you"],quote:["i make","i show","choice","i'm a","im a","quote is","showing","bid for","offer at","offered at"],fill:["done","fill","filled","mine","yours","i buy","i sell","you buy","you sell","agreed","done at","i'll take","ill take","i take","sold","bought","lift","lifted","hit the","trade done"]};
+  const FOLLOW=["will confirm","confirm by","revert","get back","follow up","follow-up","send confirm","check and","let me check","come back to you","i'll send","ill send","by eod","by end of day","tomorrow","later today","chase","await","awaiting","pending","still waiting","waiting on"];
+  const BUY=["i buy","you sell","mine","lift","lifted","i'll take","ill take","i take","bought"];const SELL=["i sell","you buy","yours","sold","give you","offer you","sell you"];
+  const FLAGS=[
+    {sev:"high",typology:"Market abuse",terms:["wash trade","manipulate","ramp the","front run","front-run","spoof","layering","fix the rate","rig the","inside info","insider","material non-public","non public","mnpi","guarantee you","guaranteed return"]},
+    {sev:"high",typology:"Information barrier",terms:["off the record","between us","keep this quiet","keep it quiet","don't tell","dont tell","delete this","delete the","collude"]},
+    {sev:"medium",typology:"Off-channel comms",terms:["whatsapp","signal app","telegram","personal email","gmail","my cell","my mobile","call my","take it offline","off channel","off-channel"]},
+    {sev:"medium",typology:"Inducement",terms:["gift","tickets","entertainment","backhander","cash payment","under the table"]},
+    {sev:"low",typology:"Conduct",terms:["idiot","stupid","screwed","pissed","wtf","shut up","hate this","useless"]}
+  ];
+  const POS=["thanks","thank you","great","appreciate","good","nice","perfect","cheers","helpful","welcome","pleasure","excellent","love it","well done","quick turn"];
+  const NEG=["unhappy","angry","wrong","late","problem","issue","unacceptable","disappointed","slow","missed","complaint","frustrat","poor","terrible","worse","worst","annoyed","not good","never again","fed up","useless","lags"];
+  const P1=/^(\d{1,2}:\d{2}(?::\d{2})?)\s+([A-Za-z0-9_.\-]{1,14})\s*[:\-\u2013]?\s+(.*)$/;
+  const P3=/^([A-Za-z0-9_.\-]{1,14})\s*[:\-\u2013]\s+(.*)$/;
+  const msgs=[];let last=null;
+  for(const raw of lines){const ln=raw.trim();if(!ln)continue;let m,time="",sender="",body="";
+    if((m=ln.match(P1))){time=m[1];sender=m[2];body=m[3];}
+    else if((m=ln.match(P3))){sender=m[1];body=m[2];}
+    else{if(last){last.body+=" "+ln;continue;}else{body=ln;sender="?";}}
+    last={time,sender,body};msgs.push(last);}
+  const has=(s,arr)=>arr.find(k=>s.includes(k));
+  const events=[],followups=[],flagsOut=[];const cps={},byUser={},notional={};
+  let rfq=0,quote=0,fill=0;const deals=[];const open=[];let did=1;
+  for(const x of msgs){const low=x.body.toLowerCase();const ts=parseT(x.time);
+    byUser[x.sender]=byUser[x.sender]||{msgs:0,flags:0,sent:0};byUser[x.sender].msgs++;
+    let inst=(x.body.match(FXPAIR)||x.body.match(FXCONCAT)||x.body.match(TICKER)||x.body.match(TENOR)||[])[0]||"";
+    if(!inst){const e=EQ.find(t=>new RegExp("\\b"+t+"\\b").test(x.body));if(e)inst=e;}
+    let assetClass="";for(const a of ASSET){if(a.re.test(x.body)){assetClass=a.cls;break;}}
+    const sz=(x.body.match(SIZE)||[])[0]||"";const notM=normSize(sz);
+    const two=x.body.match(TWO_SIDED);const at=x.body.match(AT_PRICE);
+    const price=two?(two[1]+"/"+two[2]):(at?at[1]:"");
+    let side=has(low,BUY)?"BUY":(has(low,SELL)?"SELL":"");
+    let cp="";const cpm=x.body.match(/(?:cp|counterparty|vs\.?|with|client|for)\s+([A-Z][A-Za-z]+(?:\s[A-Z][A-Za-z]+){0,2})/);
+    if(cpm)cp=cpm[1].trim();
+    const isFill=!!has(low,KW.fill);const isQuote=!!(two||(has(low,KW.quote)&&inst));
+    const isRFQ=!!(has(low,KW.rfq)||(sz&&inst&&/where|px|price|level|make|looking|need|pay/.test(low)));
+    let type=isFill?"FILL":(isQuote?"QUOTE":(isRFQ?"RFQ":""));
+    if(type)events.push({time:x.time,ts,sender:x.sender,type,inst,assetClass,size:sz,notM,side,price,cp,body:x.body});
+    if(type==="RFQ"){rfq++;const d={id:"D"+(did++),inst,assetClass,size:sz,notM,side,cp,rfqTime:x.time,rfqTs:ts,rfqBy:x.sender,status:"requested",quotePrice:"",fillPrice:"",t2q:null,t2f:null};deals.push(d);open.push(d);}
+    else if(type==="QUOTE"){quote++;const d=[...open].reverse().find(o=>(!inst||!o.inst||o.inst===inst)&&o.status==="requested")||[...open].reverse().find(o=>o.status==="requested");if(d){d.status="quoted";d.quotePrice=price;if(d.rfqTs!=null&&ts!=null)d.t2q=ts-d.rfqTs;}}
+    else if(type==="FILL"){fill++;const d=[...open].reverse().find(o=>(!inst||!o.inst||o.inst===inst)&&o.status!=="filled")||[...open].reverse().find(o=>o.status!=="filled");if(d){d.status="filled";d.fillPrice=price||d.quotePrice;if(d.rfqTs!=null&&ts!=null)d.t2f=ts-d.rfqTs;if(side&&!d.side)d.side=side;if(cp&&!d.cp)d.cp=cp;const i=open.indexOf(d);if(i>=0)open.splice(i,1);}}
+    if(cp){cps[cp]=cps[cp]||{mentions:0,sent:0};cps[cp].mentions++;}
+    if(type==="RFQ"&&inst&&notM){notional[assetClass||inst]=(notional[assetClass||inst]||0)+notM;}
+    if(has(low,FOLLOW))followups.push({time:x.time,sender:x.sender,body:x.body});
+    let s=0;POS.forEach(w=>{if(low.includes(w))s++;});NEG.forEach(w=>{if(low.includes(w))s--;});
+    byUser[x.sender].sent+=s;if(cp)cps[cp].sent+=s;
+    for(const grp of FLAGS){const hit=has(low,grp.terms);if(hit){flagsOut.push({time:x.time,sender:x.sender,sev:grp.sev,typology:grp.typology,term:hit,body:x.body});byUser[x.sender].flags++;}}
+  }
+  const cpKey=n=>n.toLowerCase().replace(/\b(capital|cap|partners|llp|ltd|limited|inc|incorporated|bank|securities|group|holdings|asset management|am|llc|plc|sa|sas)\b/g,"").replace(/[^a-z0-9]/g,"");
+  const resolved={};
+  for(const [name,v] of Object.entries(cps)){const k=cpKey(name)||name.toLowerCase();if(!resolved[k])resolved[k]={name,mentions:0,sent:0,aliases:new Set()};const rr=resolved[k];rr.mentions+=v.mentions;rr.sent+=v.sent;rr.aliases.add(name);if(name.length>rr.name.length)rr.name=name;}
+  const counterparties=Object.values(resolved).map(rr=>({name:rr.name,mentions:rr.mentions,sent:rr.sent,aliases:[...rr.aliases]})).sort((a,b)=>b.mentions-a.mentions);
+  const typologies={};for(const f of flagsOut){typologies[f.typology]=(typologies[f.typology]||0)+1;}
+  const filled=deals.filter(d=>d.status==="filled");
+  const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+  const t2fs=filled.filter(d=>d.t2f!=null).map(d=>d.t2f);
+  return{stats:{messages:msgs.length,deals:deals.length,filled:filled.length,hit:deals.length?Math.round(100*filled.length/deals.length):0,followups:followups.length,flags:flagsOut.length,highFlags:flagsOut.filter(f=>f.sev==="high").length,users:Object.keys(byUser).length,avgT2F:avg(t2fs),notionalM:Math.round(Object.values(notional).reduce((a,b)=>a+b,0))},
+    deals,events,followups,flags:flagsOut,typologies,counterparties,byUser:Object.entries(byUser).map(([n,v])=>({user:n,...v})).sort((a,b)=>b.msgs-a.msgs)};
+}
+
+/* ===== sample captured transcript (illustrative) ===== */
+const SAMPLE=`08:31 JM: morning all, looking for 50m EUR/USD spot, where are you?
+08:31 DESK: 1.0842 / 1.0844, can do 50 cp Meridian
+08:32 JM: done at 44, thanks great level
+08:33 RT: need a price on 100m USD/JPY 1m fwd for Northbridge
+08:34 DESK: 156.20 / 156.24
+08:36 RT: yours at 20, done with Northbridge Capital
+08:40 SK: where can you pay on 25m 10y swap?
+08:41 DESK: i make 3.92 / 3.95
+08:42 SK: will revert by eod
+08:45 JM: gold? looking 5k xau for Halcyon
+08:46 DESK: 2348.5 / 2349.0
+08:47 JM: i buy 5k done vs Halcyon Bank
+08:55 RT: keep this off the record but lets fix the rate on the london close
+09:02 SK: ping me on whatsapp about the Meridian Capital trade later
+09:10 DESK: got some tickets to the game if you want to talk flow
+09:12 JM: cheers, appreciate the quick turn earlier
+09:20 RT: this system is useless when it lags
+09:25 SK: still waiting on confirm for the 10y, will chase Northbridge
+09:30 JM: looking 30m GBP/USD where r u
+09:31 DESK: 1.2710 / 1.2712`;
+
+/* ===== render ===== */
+const $=id=>document.getElementById(id);const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sec=s=>s==null?"—":(s<90?s+"s":(s/60).toFixed(1)+"m");
+const sentTxt=s=>s>0?"Positive":s<0?"Negative":"Neutral";const sentCls=s=>s>0?"pos":s<0?"neg":"neu";
+const R=extract(SAMPLE);
+
+function kpiHTML(){
+  const s=R.stats;
+  const rows=[["Messages analysed",s.messages,""],["Deals reconstructed",s.deals,"amber"],["Hit rate",s.hit+"<small>%</small>","amber"],["Avg time-to-fill",sec(s.avgT2F),"amber"],["Open follow-ups",s.followups,"green"],["High alerts",s.highFlags,"red"]];
+  return rows.map(([k,v,c])=>`<div class="kpi ${c}"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+}
+function dealsTable(t,limit){
+  const d=limit?R.deals.slice(0,limit):R.deals;
+  return `<tr><th>ID</th><th>Instrument</th><th>Class</th><th>Size</th><th>Status</th><th>Price</th><th>T2Q</th><th>T2F</th><th>Counterparty</th></tr>`+
+    d.map(x=>`<tr><td class="mono">${x.id}</td><td class="mono">${esc(x.inst)||"—"}</td><td><span class="tag">${esc(x.assetClass)||"—"}</span></td><td class="mono">${esc(x.size)||"—"}</td><td><span class="st ${x.status}">${x.status}</span></td><td class="mono">${esc(x.fillPrice||x.quotePrice)||"—"}</td><td class="mono">${sec(x.t2q)}</td><td class="mono">${sec(x.t2f)}</td><td>${esc(x.cp)||"—"}</td></tr>`).join("");
+}
+function flagsTable(limit){
+  const f=limit?R.flags.slice(0,limit):R.flags;
+  return `<tr><th>Time</th><th>From</th><th>Sev</th><th>Typology</th><th>Message</th></tr>`+
+    f.map(x=>`<tr><td class="mono">${esc(x.time)}</td><td class="mono">${esc(x.sender)}</td><td><span class="pill ${x.sev}">${x.sev}</span></td><td>${esc(x.typology)}</td><td class="snip">${esc(x.body)}</td></tr>`).join("");
+}
+function boot(){
+  $("kpis").innerHTML=kpiHTML();
+  $("ovDeals").innerHTML=dealsTable(null,4);
+  $("ovFlags").innerHTML=flagsTable(4);
+  $("ovAlertC").textContent=R.stats.flags+" total";
+  $("navAlerts").textContent=R.stats.highFlags;
+  $("deskDeals").innerHTML=dealsTable();
+  $("compFlags").innerHTML=flagsTable();
+  $("compFlagC").textContent=R.stats.flags+" flagged";
+  // typology cards
+  const order=[["Market abuse","high"],["Information barrier","high"],["Off-channel comms","med"],["Inducement","med"],["Conduct",""]];
+  $("typoCards").innerHTML=order.map(([n,c])=>`<div class="typo ${c}"><div class="n">${n}</div><div class="v">${R.typologies[n]||0}</div></div>`).join("");
+  // counterparties
+  $("cpTable").innerHTML=`<tr><th>Counterparty</th><th>Aliases</th><th>Mentions</th><th>Sentiment</th></tr>`+
+    R.counterparties.map(c=>`<tr><td>${esc(c.name)}</td><td class="mono" style="color:var(--fg-faint)">${c.aliases.map(esc).join(", ")}</td><td class="mono">${c.mentions}</td><td class="${sentCls(c.sent)}">${sentTxt(c.sent)}</td></tr>`).join("");
+  // users
+  $("usTable").innerHTML=`<tr><th>User</th><th>Messages</th><th>Flags</th><th>Tone</th></tr>`+
+    R.byUser.map(u=>`<tr><td class="mono">${esc(u.user)}</td><td class="mono">${u.msgs}</td><td class="mono" style="${u.flags?'color:var(--red)':''}">${u.flags}</td><td class="${sentCls(u.sent)}">${sentTxt(u.sent)}</td></tr>`).join("");
+  // archive = all events
+  $("arTable").innerHTML=`<tr><th>Time</th><th>From</th><th>Type</th><th>Instrument</th><th>Message</th></tr>`+
+    R.events.map(e=>`<tr><td class="mono">${esc(e.time)}</td><td class="mono">${esc(e.sender)}</td><td><span class="tag">${e.type}</span></td><td class="mono">${esc(e.inst)||"—"}</td><td class="snip">${esc(e.body)}</td></tr>`).join("");
+}
+
+/* ===== navigation ===== */
+const titles={overview:"Dashboard",desk:"Deals & flow",cp:"Counterparties",users:"Desk activity",comp:"Surveillance",archive:"Archive & search"};
+function show(view){
+  document.querySelectorAll(".view").forEach(v=>v.hidden=true);
+  $("view-"+view).hidden=false;
+  $("ttl").textContent=titles[view]||"Dashboard";
+  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("active",a.dataset.view===view));
+  // engine accent: desk views amber, comp/archive green, overview neutral
+  const eng=(view==="comp"||view==="archive")?"compliance":(view==="overview")?"overview":"desk";
+  document.documentElement.dataset.engine=eng;
+  document.querySelectorAll("#toggle button").forEach(b=>b.classList.toggle("on",b.dataset.e===eng));
+}
+document.getElementById("nav").addEventListener("click",e=>{const a=e.target.closest("a[data-view]");if(a)show(a.dataset.view);});
+document.getElementById("toggle").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const e2=b.dataset.e;show(e2==="desk"?"desk":e2==="compliance"?"comp":"overview");});
+function flash(msg){const f=$("flash");f.textContent=msg;f.classList.add("show");setTimeout(()=>f.classList.remove("show"),2600);}
+document.getElementById("auditBtn").addEventListener("click",()=>flash("Audit pack queued — "+R.stats.flags+" flags, "+R.stats.deals+" deals exported (demo)"));
+
+boot();show("overview");
+</script>
+</body>
+</html>
