@@ -24,6 +24,7 @@
 .btn-sm{padding:9px 16px;font-size:13px;border-radius:8px}
 .app-note{font-size:12px;color:var(--fg-faint);margin-top:14px;line-height:1.6}
 #results{margin-top:30px;display:none}
+#metricline{grid-template-columns:repeat(4,1fr)}@media(max-width:520px){#metricline{grid-template-columns:repeat(2,1fr)}}
 .statline{display:grid;grid-template-columns:repeat(8,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 @media(max-width:900px){.statline{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:520px){.statline{grid-template-columns:repeat(2,1fr)}}
@@ -109,17 +110,23 @@ td.mono{font-family:var(--mono);color:var(--fg)}
 
     <div id="results">
       <div class="statline" id="statline"></div>
+      <div class="statline" id="metricline" style="margin-top:14px"></div>
 
       <div class="tabbar">
         <button class="tab active" data-tab="intel">Desk Intelligence</button>
         <button class="tab" data-tab="comp">Compliance &amp; HR</button>
         <div class="tab-export">
           <button class="btn btn-ghost btn-sm" id="btnJSON">Export JSON</button>
-          <button class="btn btn-ghost btn-sm" id="btnCSV">Export CSV</button>
+          <button class="btn btn-ghost btn-sm" id="btnCSV">Events CSV</button>
+          <button class="btn btn-ghost btn-sm" id="btnDeals">Deals CSV</button>
         </div>
       </div>
 
       <div class="panel on" id="panel-intel">
+        <div class="block">
+          <div class="bh">Reconstructed deals · RFQ → quote → fill <span class="c" id="dlCount"></span></div>
+          <div style="overflow-x:auto"><table id="dealsTable"></table></div>
+        </div>
         <div class="block">
           <div class="bh">Extracted trade events <span class="c" id="evCount"></span></div>
           <div style="overflow-x:auto"><table id="evTable"></table></div>
@@ -185,20 +192,35 @@ const SAMPLE = `09:41 JM: morning all, looking for 25m EUR/USD spot where are yo
 10:00 KL: done, yours at 10. appreciate the quick turn
 10:02 DESK: chase Northbridge on the 50m swap, still pending`;
 
+function parseT(t){if(!t)return null;const p=t.split(":").map(Number);return p[0]*3600+p[1]*60+(p[2]||0);}
+function fmtDur(s){if(s==null||s<0)return "—";if(s<60)return s+"s";const m=Math.floor(s/60),r=s%60;return m+"m"+(r?(" "+r+"s"):"");}
+function normSize(sz){if(!sz)return 0;const m=sz.match(/(\d+(?:\.\d+)?)\s?(k|m|mm|bn|yards?|mio|mln)?/i);if(!m)return 0;let n=parseFloat(m[1]);const u=(m[2]||"m").toLowerCase();if(u==="k")n*=0.001;else if(u==="bn"||u.startsWith("yard"))n*=1000;return n;}
+
 function extract(text){
-  const lines = text.split(/\r?\n/);
-  const SIZE = /\b(\d+(?:\.\d+)?)\s?(k|m|mm|bn|yards?|mio|mln)\b/i;
-  const FX   = /\b([A-Z]{3}\/[A-Z]{3}|EUR|USD|GBP|JPY|CHF|AUD|CAD|NZD)(?:\/[A-Z]{3})?\b/;
-  const FXPAIR = /\b([A-Z]{3}\/[A-Z]{3})\b/;
-  const TENOR = /\b(\d{1,2}\s?(?:y|yr|yrs|year|m|mo))\b/i;
-  const TWO_SIDED = /(\d+(?:\.\d+)?)\s?[\/\-]\s?(\d+(?:\.\d+)?)/;
-  const AT_PRICE  = /(?:@|at)\s?(\d+(?:\.\d{2,6}))/i;
-  const KW = {
-    rfq:["looking for","where are you","where r u","where you","px on","price on","level on","can you make","make me","show me","rfq","quote on","mid on","axe","your axe","interest in","what's your","whats your","where do you","where's","can i get","need a price","where can you pay","where can you"],
-    quote:["i make","i show","bid","offer","choice","i'm a","im a","quote is","showing","bid for","offer at"],
-    fill:["done","fill","filled","mine","yours","i buy","i sell","you buy","you sell","agreed","confirmed at","done at","trade","i'll take","ill take","i take","ur done","you're done"],
-    follow:["will confirm","confirm by","revert","get back","follow up","follow-up","send confirm","check and","let me check","come back to you","i'll send","ill send","send you the","by eod","by end of day","tomorrow","later today","chase","ttyl","await","awaiting","pending"]
+  const lines=text.split(/\r?\n/);
+  const SIZE=/\b(\d+(?:\.\d+)?)\s?(k|m|mm|bn|yards?|mio|mln)\b/i;
+  const FXPAIR=/\b([A-Z]{3}\/[A-Z]{3})\b/;
+  const FXCONCAT=/\b(EUR|GBP|AUD|NZD|USD)(USD|JPY|CHF|CAD|GBP)\b/;
+  const TENOR=/\b(\d{1,2}\s?(?:y|yr|yrs|year|mo|mth))\b/i;
+  const TWO_SIDED=/(\d+(?:\.\d+)?)\s?[\/\-]\s?(\d+(?:\.\d+)?)/;
+  const AT_PRICE=/(?:@|at)\s?(\d+(?:\.\d{2,6}))/i;
+  const TICKER=/\$([A-Z]{1,5})\b/;
+  const EQ=["AAPL","MSFT","TSLA","AMZN","GOOGL","META","NVDA","SPX","ESTX","FTSE","DAX","NKY"];
+  const ASSET=[
+    {cls:"FX",re:/[A-Z]{3}\/[A-Z]{3}|EURUSD|GBPUSD|USDJPY|AUDUSD|USDCHF|USDCAD/},
+    {cls:"Metals",re:/\b(gold|xau|silver|xag|platinum|xpt)\b/i},
+    {cls:"Energy",re:/\b(brent|wti|crude|nat\s?gas|natgas)\b/i},
+    {cls:"Rates",re:/\b(\d{1,2}\s?(?:y|yr|yrs|year))\b|\bswap\b|\bbond\b|\bgilt\b|\btreasury\b|\bbund\b|\bjgb\b/i},
+    {cls:"Equities",re:/\$[A-Z]{1,5}\b|\b(AAPL|MSFT|TSLA|AMZN|GOOGL|META|NVDA|SPX|FTSE|DAX)\b/}
+  ];
+  const KW={
+    rfq:["looking for","where are you","where r u","where you","px on","price on","level on","can you make","make me","show me","rfq","quote on","mid on","axe","your axe","interest in","what's your","whats your","where do you","where's","can i get","need a price","where can you pay","where can you","show me a"],
+    quote:["i make","i show","choice","i'm a","im a","quote is","showing","bid for","offer at","offered at"],
+    fill:["done","fill","filled","mine","yours","i buy","i sell","you buy","you sell","agreed","done at","i'll take","ill take","i take","ur done","you're done","sold","bought","lift","lifted","hit the","trade done"]
   };
+  const FOLLOW=["will confirm","confirm by","revert","get back","follow up","follow-up","send confirm","check and","let me check","come back to you","i'll send","ill send","send you the","by eod","by end of day","tomorrow","later today","chase","ttyl","await","awaiting","pending"];
+  const BUY=["i buy","you sell","mine","lift","lifted","i'll take","ill take","i take","bought"];
+  const SELL=["i sell","you buy","yours","sold","give you","offer you","sell you"];
   const FLAGS=[
     {sev:"high",terms:["off the record","between us","keep this quiet","keep it quiet","don't tell","dont tell","delete this","delete the","wash trade","manipulate","ramp the","front run","front-run","inside info","insider","material non-public","non public","mnpi","guarantee you","guaranteed return","collude","spoof","layering","fix the rate","rig the"]},
     {sev:"medium",terms:["whatsapp","signal app","telegram","personal email","gmail","my cell","my mobile","call my","take it offline","off channel","off-channel","gift","tickets","entertainment","backhander","cash payment","under the table"]},
@@ -210,41 +232,51 @@ function extract(text){
   const P2=/^\[(\d{1,2}:\d{2}(?::\d{2})?)\]\s*<?([A-Za-z0-9_.\-]{1,14})>?\s*[:\-]?\s*(.*)$/;
   const P3=/^([A-Za-z0-9_.\-]{1,14})\s*[:\-\u2013]\s+(.*)$/;
   const msgs=[];let last=null;
-  for(const raw of lines){
-    const ln=raw.trim();if(!ln)continue;let m,time="",sender="",body="";
+  for(const raw of lines){const ln=raw.trim();if(!ln)continue;let m,time="",sender="",body="";
     if((m=ln.match(P2))){time=m[1];sender=m[2];body=m[3];}
     else if((m=ln.match(P1))){time=m[1];sender=m[2];body=m[3];}
     else if((m=ln.match(P3))){sender=m[1];body=m[2];}
     else{if(last){last.body+=" "+ln;continue;}else{body=ln;sender="?";}}
-    last={time,sender,body,types:[],flags:[],sentiment:0};msgs.push(last);
-  }
+    last={time,sender,body};msgs.push(last);}
   const has=(s,arr)=>arr.find(k=>s.includes(k));
-  const events=[],followups=[],flagsOut=[];const cps={},byUser={};
-  let rfq=0,quote=0,fill=0;
+  const events=[],followups=[],flagsOut=[];const cps={},byUser={},notional={};
+  let rfq=0,quote=0,fill=0;const deals=[];const open=[];let did=1;
   for(const x of msgs){
-    const low=x.body.toLowerCase();
+    const low=x.body.toLowerCase();const ts=parseT(x.time);
     byUser[x.sender]=byUser[x.sender]||{msgs:0,flags:0,sent:0};byUser[x.sender].msgs++;
-    const inst=(x.body.match(FXPAIR)||x.body.match(TENOR)||x.body.match(FX)||[])[0]||"";
-    const sz=(x.body.match(SIZE)||[])[0]||"";
+    let inst=(x.body.match(FXPAIR)||x.body.match(FXCONCAT)||x.body.match(TICKER)||x.body.match(TENOR)||[])[0]||"";
+    if(!inst){const e=EQ.find(t=>new RegExp("\\b"+t+"\\b").test(x.body));if(e)inst=e;}
+    let assetClass="";for(const a of ASSET){if(a.re.test(x.body)){assetClass=a.cls;break;}}
+    const sz=(x.body.match(SIZE)||[])[0]||"";const notM=normSize(sz);
     const two=x.body.match(TWO_SIDED);const at=x.body.match(AT_PRICE);
     const price=two?(two[1]+"/"+two[2]):(at?at[1]:"");
+    let side=has(low,BUY)?"BUY":(has(low,SELL)?"SELL":"");
     let cp="";const cpm=x.body.match(/(?:cp|counterparty|vs\.?|with|client|for)\s+([A-Z][A-Za-z]+(?:\s[A-Z][A-Za-z]+){0,2})/);
     if(cpm)cp=cpm[1].trim();
     const isFill=!!has(low,KW.fill);
     const isQuote=!!(two||(has(low,KW.quote)&&inst));
     const isRFQ=!!(has(low,KW.rfq)||(sz&&inst&&/where|px|price|level|make|quote|looking|need|pay/.test(low)));
     let type=isFill?"FILL":(isQuote?"QUOTE":(isRFQ?"RFQ":""));
-    if(type==="RFQ")rfq++;else if(type==="QUOTE")quote++;else if(type==="FILL")fill++;
-    if(type){x.types.push(type);events.push({time:x.time,sender:x.sender,type,inst,size:sz,price,cp,body:x.body});}
+    if(type)events.push({time:x.time,ts,sender:x.sender,type,inst,assetClass,size:sz,notM,side,price,cp,body:x.body});
+    if(type==="RFQ"){rfq++;const d={id:"D"+(did++),inst,assetClass,size:sz,notM,side,cp,rfqTime:x.time,rfqTs:ts,rfqBy:x.sender,status:"requested",quoteTs:null,quotePrice:"",fillTs:null,fillPrice:"",t2q:null,t2f:null};deals.push(d);open.push(d);}
+    else if(type==="QUOTE"){quote++;const d=[...open].reverse().find(o=>(!inst||!o.inst||o.inst===inst)&&o.status==="requested")||[...open].reverse().find(o=>o.status==="requested");if(d){d.status="quoted";d.quoteTs=ts;d.quotePrice=price;if(d.rfqTs!=null&&ts!=null)d.t2q=ts-d.rfqTs;if(price&&!d.price)d.price=price;}}
+    else if(type==="FILL"){fill++;const d=[...open].reverse().find(o=>(!inst||!o.inst||o.inst===inst)&&o.status!=="filled")||[...open].reverse().find(o=>o.status!=="filled");if(d){d.status="filled";d.fillTs=ts;d.fillPrice=price||d.quotePrice;if(d.rfqTs!=null&&ts!=null)d.t2f=ts-d.rfqTs;if(side&&!d.side)d.side=side;const i=open.indexOf(d);if(i>=0)open.splice(i,1);}}
     if(cp){cps[cp]=cps[cp]||{mentions:0,sent:0};cps[cp].mentions++;}
-    if(has(low,KW.follow))followups.push({time:x.time,sender:x.sender,body:x.body});
+    if(type==="RFQ"&&inst&&notM){notional[assetClass||inst]=(notional[assetClass||inst]||0)+notM;}
+    if(has(low,FOLLOW))followups.push({time:x.time,sender:x.sender,body:x.body});
     let s=0;POS.forEach(w=>{if(low.includes(w))s++;});NEG.forEach(w=>{if(low.includes(w))s--;});
-    x.sentiment=s;byUser[x.sender].sent+=s;if(cp)cps[cp].sent+=s;
-    for(const grp of FLAGS){const hit=has(low,grp.terms);if(hit){x.flags.push({sev:grp.sev,term:hit});flagsOut.push({time:x.time,sender:x.sender,sev:grp.sev,term:hit,body:x.body});byUser[x.sender].flags++;}}
+    byUser[x.sender].sent+=s;if(cp)cps[cp].sent+=s;
+    for(const grp of FLAGS){const hit=has(low,grp.terms);if(hit){flagsOut.push({time:x.time,sender:x.sender,sev:grp.sev,term:hit,body:x.body});byUser[x.sender].flags++;}}
   }
-  const hit=rfq?Math.round(100*fill/rfq):0;
-  return{stats:{messages:msgs.length,rfq,quote,fill,hit,followups:followups.length,flags:flagsOut.length,users:Object.keys(byUser).length},
-    events,followups,flags:flagsOut,
+  const filled=deals.filter(d=>d.status==="filled");
+  const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+  const t2qs=deals.filter(d=>d.t2q!=null).map(d=>d.t2q);
+  const t2fs=filled.filter(d=>d.t2f!=null).map(d=>d.t2f);
+  return{stats:{messages:msgs.length,deals:deals.length,rfq,quote,fill,filled:filled.length,
+      hit:deals.length?Math.round(100*filled.length/deals.length):0,
+      followups:followups.length,flags:flagsOut.length,users:Object.keys(byUser).length,
+      avgT2Q:avg(t2qs),avgT2F:avg(t2fs),notionalM:Math.round(Object.values(notional).reduce((a,b)=>a+b,0))},
+    deals,events,followups,flags:flagsOut,notional,
     counterparties:Object.entries(cps).map(([n,v])=>({name:n,...v})).sort((a,b)=>b.mentions-a.mentions),
     byUser:Object.entries(byUser).map(([n,v])=>({user:n,...v})).sort((a,b)=>b.msgs-a.msgs)};
 }
@@ -253,22 +285,31 @@ const $=id=>document.getElementById(id);
 const esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const sentClass=n=>n>0?"sent-pos":n<0?"sent-neg":"sent-neu";
 const sentTxt=n=>n>0?("+"+n+" positive"):n<0?(n+" negative"):"neutral";
+const STAT_PILL={requested:"RFQ",quoted:"QUOTE",filled:"FILL"};
 let LAST=null;
 
 function render(r){
-  LAST=r;
-  $("results").style.display="block";
-  const s=r.stats;
+  LAST=r;$("results").style.display="block";const s=r.stats;
   $("statline").innerHTML=[
-    ["Messages",s.messages,""],["RFQs",s.rfq,"var(--amber)"],["Quotes",s.quote,"#7FA8FF"],
-    ["Fills",s.fill,"var(--green)"],["Hit rate",s.hit+"%",""],["Follow-ups",s.followups,""],
-    ["Flags",s.flags,s.flags?"var(--red)":""],["Users",s.users,""]
+    ["Messages",s.messages,""],["Deals",s.deals,""],["RFQs",s.rfq,"var(--amber)"],
+    ["Quotes",s.quote,"#7FA8FF"],["Fills",s.fill,"var(--green)"],["Hit rate",s.hit+"%",""],
+    ["Follow-ups",s.followups,""],["Flags",s.flags,s.flags?"var(--red)":""]
   ].map(([k,v,c])=>`<div class="sc"><div class="k">${k}</div><div class="v" style="${c?'color:'+c:''}">${v}</div></div>`).join("");
+  $("metricline").innerHTML=[
+    ["Avg time → quote",fmtDur(s.avgT2Q)],["Avg time → fill",fmtDur(s.avgT2F)],
+    ["RFQ notional","$"+s.notionalM+"m"],["Active users",s.users]
+  ].map(([k,v])=>`<div class="sc"><div class="k">${k}</div><div class="v" style="font-size:21px">${v}</div></div>`).join("");
+
+  $("dlCount").textContent=r.deals.length+" reconstructed";
+  $("dealsTable").innerHTML=r.deals.length?
+    `<tr><th>ID</th><th>Instrument</th><th>Class</th><th>Size</th><th>Status</th><th>→ Quote</th><th>→ Fill</th><th>Price</th><th>CP</th></tr>`+
+    r.deals.map(d=>`<tr><td class="mono">${d.id}</td><td class="mono">${esc(d.inst)||"—"}</td><td>${esc(d.assetClass)||"—"}</td><td class="mono">${esc(d.size)||"—"}</td><td><span class="pill ${STAT_PILL[d.status]}">${d.status}</span></td><td class="mono">${fmtDur(d.t2q)}</td><td class="mono">${fmtDur(d.t2f)}</td><td class="mono">${esc(d.fillPrice||d.quotePrice)||"—"}</td><td>${esc(d.cp)||"—"}</td></tr>`).join("")
+    :`<tr><td class="empty">No deals reconstructed.</td></tr>`;
 
   $("evCount").textContent=r.events.length+" detected";
   $("evTable").innerHTML=r.events.length?
-    `<tr><th>Time</th><th>From</th><th>Type</th><th>Instrument</th><th>Size</th><th>Price</th><th>Counterparty</th></tr>`+
-    r.events.map(e=>`<tr><td class="mono">${esc(e.time)||"—"}</td><td class="mono">${esc(e.sender)}</td><td><span class="pill ${e.type}">${e.type}</span></td><td class="mono">${esc(e.inst)||"—"}</td><td class="mono">${esc(e.size)||"—"}</td><td class="mono">${esc(e.price)||"—"}</td><td>${esc(e.cp)||"—"}</td></tr>`).join("")
+    `<tr><th>Time</th><th>From</th><th>Type</th><th>Instrument</th><th>Class</th><th>Size</th><th>Side</th><th>Price</th><th>CP</th></tr>`+
+    r.events.map(e=>`<tr><td class="mono">${esc(e.time)||"—"}</td><td class="mono">${esc(e.sender)}</td><td><span class="pill ${e.type}">${e.type}</span></td><td class="mono">${esc(e.inst)||"—"}</td><td>${esc(e.assetClass)||"—"}</td><td class="mono">${esc(e.size)||"—"}</td><td class="mono">${esc(e.side)||"—"}</td><td class="mono">${esc(e.price)||"—"}</td><td>${esc(e.cp)||"—"}</td></tr>`).join("")
     :`<tr><td class="empty">No trade events detected.</td></tr>`;
 
   $("cpTable").innerHTML=r.counterparties.length?
@@ -294,16 +335,8 @@ function render(r){
   $("results").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
-function download(name,content,type){
-  const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
-}
-function toCSV(events){
-  const head=["time","sender","type","instrument","size","price","counterparty","message"];
-  const rows=events.map(e=>[e.time,e.sender,e.type,e.inst,e.size,e.price,e.cp,e.body]
-    .map(v=>'"'+String(v||"").replace(/"/g,'""')+'"').join(","));
-  return head.join(",")+"\n"+rows.join("\n");
-}
+function download(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+function csv(rows,head){return head.join(",")+"\n"+rows.map(r=>r.map(v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"').join(",")).join("\n");}
 
 document.addEventListener("DOMContentLoaded",function(){
   const input=$("chatInput");
@@ -313,13 +346,11 @@ document.addEventListener("DOMContentLoaded",function(){
   $("btnExtract").addEventListener("click",()=>{if(input.value.trim())render(extract(input.value));});
   $("btnClear").addEventListener("click",()=>{input.value="";updateCount();$("results").style.display="none";});
   $("btnJSON").addEventListener("click",()=>{if(LAST)download("chatguard-extract.json",JSON.stringify(LAST,null,2),"application/json");});
-  $("btnCSV").addEventListener("click",()=>{if(LAST)download("chatguard-events.csv",toCSV(LAST.events),"text/csv");});
+  $("btnCSV").addEventListener("click",()=>{if(LAST)download("chatguard-events.csv",csv(LAST.events.map(e=>[e.time,e.sender,e.type,e.inst,e.assetClass,e.size,e.side,e.price,e.cp,e.body]),["time","sender","type","instrument","class","size","side","price","counterparty","message"]),"text/csv");});
+  $("btnDeals").addEventListener("click",()=>{if(LAST)download("chatguard-deals.csv",csv(LAST.deals.map(d=>[d.id,d.inst,d.assetClass,d.size,d.status,d.t2q,d.t2f,d.fillPrice||d.quotePrice,d.cp]),["id","instrument","class","size","status","secs_to_quote","secs_to_fill","price","counterparty"]),"text/csv");});
   document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",function(){
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    this.classList.add("active");
-    const k=this.dataset.tab;
-    $("panel-intel").classList.toggle("on",k==="intel");
-    $("panel-comp").classList.toggle("on",k==="comp");
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));this.classList.add("active");
+    const k=this.dataset.tab;$("panel-intel").classList.toggle("on",k==="intel");$("panel-comp").classList.toggle("on",k==="comp");
   }));
 });
 </script>
