@@ -327,9 +327,8 @@ const SAMPLE=`08:31 JM: morning all, looking for 50m EUR/USD spot, where are you
 const $=id=>document.getElementById(id);const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sec=s=>s==null?"—":(s<90?s+"s":(s/60).toFixed(1)+"m");
 const sentTxt=s=>s>0?"Positive":s<0?"Negative":"Neutral";const sentCls=s=>s>0?"pos":s<0?"neg":"neu";
-// ── To use the live API instead of the in-browser engine, set API_BASE to your
-//    deployed Netlify URL (or pass ?api=https://your-site.netlify.app in the URL).
-const API_BASE=(new URLSearchParams(location.search).get("api")||"").replace(/\/$/,"");
+// ── Live extraction API (Netlify). Override per-visit with ?api=https://other-host
+const API_BASE=(new URLSearchParams(location.search).get("api")||"https://stellar-puffpuff-0b29d6.netlify.app").replace(/\/$/,"");
 let R=extract(SAMPLE);
 
 function kpiHTML(){
