@@ -31,9 +31,11 @@ function extract(text){
   const BUY=["i buy","you sell","mine","lift","lifted","i'll take","ill take","i take","bought"];
   const SELL=["i sell","you buy","yours","sold","give you","offer you","sell you"];
   const FLAGS=[
-    {sev:"high",terms:["off the record","between us","keep this quiet","keep it quiet","don't tell","dont tell","delete this","delete the","wash trade","manipulate","ramp the","front run","front-run","inside info","insider","material non-public","non public","mnpi","guarantee you","guaranteed return","collude","spoof","layering","fix the rate","rig the"]},
-    {sev:"medium",terms:["whatsapp","signal app","telegram","personal email","gmail","my cell","my mobile","call my","take it offline","off channel","off-channel","gift","tickets","entertainment","backhander","cash payment","under the table"]},
-    {sev:"low",terms:["idiot","stupid","screwed","pissed","wtf","shut up","hate this","useless"]}
+    {sev:"high",typology:"Market abuse",terms:["wash trade","manipulate","ramp the","front run","front-run","spoof","layering","fix the rate","rig the","inside info","insider","material non-public","non public","mnpi","guarantee you","guaranteed return"]},
+    {sev:"high",typology:"Information barrier",terms:["off the record","between us","keep this quiet","keep it quiet","don't tell","dont tell","delete this","delete the","collude"]},
+    {sev:"medium",typology:"Off-channel comms",terms:["whatsapp","signal app","telegram","personal email","gmail","my cell","my mobile","call my","take it offline","off channel","off-channel"]},
+    {sev:"medium",typology:"Inducement",terms:["gift","tickets","entertainment","backhander","cash payment","under the table"]},
+    {sev:"low",typology:"Conduct",terms:["idiot","stupid","screwed","pissed","wtf","shut up","hate this","useless"]}
   ];
   const POS=["thanks","thank you","great","appreciate","good","nice","perfect","cheers","helpful","welcome","pleasure","excellent","love it","well done","quick turn"];
   const NEG=["unhappy","angry","wrong","late","problem","issue","unacceptable","disappointed","slow","missed","complaint","frustrat","poor","terrible","worse","worst","annoyed","not good","never again","fed up","nothing there"];
@@ -75,18 +77,30 @@ function extract(text){
     if(has(low,FOLLOW))followups.push({time:x.time,sender:x.sender,body:x.body});
     let s=0;POS.forEach(w=>{if(low.includes(w))s++;});NEG.forEach(w=>{if(low.includes(w))s--;});
     byUser[x.sender].sent+=s;if(cp)cps[cp].sent+=s;
-    for(const grp of FLAGS){const hit=has(low,grp.terms);if(hit){flagsOut.push({time:x.time,sender:x.sender,sev:grp.sev,term:hit,body:x.body});byUser[x.sender].flags++;}}
+    for(const grp of FLAGS){const hit=has(low,grp.terms);if(hit){flagsOut.push({time:x.time,sender:x.sender,sev:grp.sev,typology:grp.typology,term:hit,body:x.body});byUser[x.sender].flags++;}}
   }
+  // counterparty resolution: group aliases (strip legal/entity suffixes)
+  const cpKey=n=>n.toLowerCase().replace(/\b(capital|cap|partners|llp|ltd|limited|inc|incorporated|bank|securities|group|holdings|asset management|am|llc|plc|sa|sas)\b/g,"").replace(/[^a-z0-9]/g,"");
+  const resolved={};
+  for(const [name,v] of Object.entries(cps)){
+    const k=cpKey(name)||name.toLowerCase();
+    if(!resolved[k]){resolved[k]={name,mentions:0,sent:0,aliases:new Set()};}
+    const r=resolved[k];r.mentions+=v.mentions;r.sent+=v.sent;r.aliases.add(name);
+    if(name.length>r.name.length)r.name=name; // prefer the most complete alias
+  }
+  const counterparties=Object.values(resolved).map(r=>({name:r.name,mentions:r.mentions,sent:r.sent,aliases:[...r.aliases]})).sort((a,b)=>b.mentions-a.mentions);
+  // typology rollup
+  const typologies={};for(const f of flagsOut){typologies[f.typology]=(typologies[f.typology]||0)+1;}
   const filled=deals.filter(d=>d.status==="filled");
   const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
   const t2qs=deals.filter(d=>d.t2q!=null).map(d=>d.t2q);
   const t2fs=filled.filter(d=>d.t2f!=null).map(d=>d.t2f);
   return{stats:{messages:msgs.length,deals:deals.length,rfq,quote,fill,filled:filled.length,
       hit:deals.length?Math.round(100*filled.length/deals.length):0,
-      followups:followups.length,flags:flagsOut.length,users:Object.keys(byUser).length,
+      followups:followups.length,flags:flagsOut.length,users:Object.keys(byUser).length,highFlags:flagsOut.filter(f=>f.sev==="high").length,
       avgSecsToQuote:avg(t2qs),avgSecsToFill:avg(t2fs),notionalM:Math.round(Object.values(notional).reduce((a,b)=>a+b,0))},
     deals,events,followups,flags:flagsOut,notional,
-    counterparties:Object.entries(cps).map(([n,v])=>({name:n,...v})).sort((a,b)=>b.mentions-a.mentions),
+    counterparties,typologies,
     byUser:Object.entries(byUser).map(([n,v])=>({user:n,...v})).sort((a,b)=>b.msgs-a.msgs)};
 }
 

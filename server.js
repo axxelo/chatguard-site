@@ -22,9 +22,11 @@ function aggregate() {
     for (const u of r.byUser) { users[u.user] = users[u.user] || { user: u.user, msgs: 0, flags: 0, sent: 0 }; users[u.user].msgs += u.msgs; users[u.user].flags += u.flags; users[u.user].sent += u.sent; }
   }
   const deals = cat("deals"), flags = cat("flags");
+  const typologies = {};
+  for (const f of flags) typologies[f.typology] = (typologies[f.typology] || 0) + 1;
   return {
     batches: batches.length,
-    deals, events: cat("events"), flags, followups: cat("followups"),
+    deals, events: cat("events"), flags, followups: cat("followups"), typologies,
     counterparties: Object.values(cps).sort((a, b) => b.mentions - a.mentions),
     byUser: Object.values(users).sort((a, b) => b.msgs - a.msgs),
     stats: {
@@ -83,6 +85,7 @@ app.get("/api/flags", (req, res) => {
   if (req.query.severity) f = f.filter(x => x.sev === req.query.severity);
   res.json(f);
 });
+app.get("/api/typologies", (_req, res) => res.json(aggregate().typologies));
 app.get("/api/followups", (_req, res) => res.json(aggregate().followups));
 app.get("/api/counterparties", (_req, res) => res.json(aggregate().counterparties));
 app.get("/api/users", (_req, res) => res.json(aggregate().byUser));

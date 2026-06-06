@@ -413,3 +413,5 @@ footer{border-top:1px solid var(--line);padding:60px 0 36px;margin-top:30px}
 .form-msg{font-size:13.5px;margin-top:14px;text-align:center;min-height:1.2em}
 .form-msg.ok{color:var(--green)}
 .form-msg.err{color:var(--red)}
+.f-soc{color:var(--fg-muted);display:inline-flex;transition:color .15s}
+.f-soc:hover{color:var(--amber)}
