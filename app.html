@@ -327,7 +327,10 @@ const SAMPLE=`08:31 JM: morning all, looking for 50m EUR/USD spot, where are you
 const $=id=>document.getElementById(id);const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sec=s=>s==null?"—":(s<90?s+"s":(s/60).toFixed(1)+"m");
 const sentTxt=s=>s>0?"Positive":s<0?"Negative":"Neutral";const sentCls=s=>s>0?"pos":s<0?"neg":"neu";
-const R=extract(SAMPLE);
+// ── To use the live API instead of the in-browser engine, set API_BASE to your
+//    deployed Netlify URL (or pass ?api=https://your-site.netlify.app in the URL).
+const API_BASE=(new URLSearchParams(location.search).get("api")||"").replace(/\/$/,"");
+let R=extract(SAMPLE);
 
 function kpiHTML(){
   const s=R.stats;
@@ -384,7 +387,16 @@ document.getElementById("toggle").addEventListener("click",e=>{const b=e.target.
 function flash(msg){const f=$("flash");f.textContent=msg;f.classList.add("show");setTimeout(()=>f.classList.remove("show"),2600);}
 document.getElementById("auditBtn").addEventListener("click",()=>flash("Audit pack queued — "+R.stats.flags+" flags, "+R.stats.deals+" deals exported (demo)"));
 
-boot();show("overview");
+async function init(){
+  if(API_BASE){
+    try{
+      const res=await fetch(API_BASE+"/api/extract",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({transcript:SAMPLE})});
+      if(res.ok){R=await res.json();flash("Live API connected — "+API_BASE);}
+    }catch(e){flash("Live API unreachable — using local engine");}
+  }
+  boot();show("overview");
+}
+init();
 </script>
 </body>
 </html>

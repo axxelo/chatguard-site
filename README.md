@@ -1,75 +1,41 @@
-# ChatGuard — reference extraction API
+# ChatGuard API on Netlify (live extraction endpoint)
 
-A runnable backend that exposes the ChatGuard chat-intelligence engine over HTTP.
-This is the bridge between the in-browser demo and a production system: the same
-extraction logic, behind real endpoints your apps can call. Storage is in-memory
-(swap for a database in production). For the full production architecture and the
-Bloomberg capture path, see `../BACKEND-INTEGRATION.md`.
+A zero-dependency Netlify Function that exposes the extraction engine:
 
-## Run it
+- `GET  /api/health`  → `{ ok: true }`
+- `POST /api/extract` → full extraction for `{ "transcript": "..." }` (CORS-enabled)
+
+Stateful storage endpoints (ingest/batches) need a database and stay on the
+Express reference server (`../backend`); serverless is stateless.
+
+## Deploy — option A: drag & drop the folder (fastest)
+1. Zip this `netlify-api` folder.
+2. Go to app.netlify.com → **Add new site → Deploy manually** → drop the zip.
+3. Netlify reads `netlify.toml`, builds the function, and gives you a URL like
+   `https://your-site.netlify.app`.
+
+## Deploy — option B: from Git (auto-rebuilds)
+1. Push this folder to a repo.
+2. Netlify → **Add new site → Import from Git** → pick the repo.
+3. Build settings are read from `netlify.toml` (publish `public`, functions `netlify/functions`).
+
+## Deploy — option C: CLI
 ```bash
-cd backend
-npm install
-npm start          # http://localhost:8787
-npm test           # smoke test (no server needed)
+cd netlify-api
+npx netlify-cli deploy --prod
 ```
-Requires Node 18+.
 
-## Endpoints
-
-| Method | Path | Purpose |
-|--------|------|---------|
-| GET  | `/health` | liveness check |
-| POST | `/api/extract` | extract from a transcript, **no storage** (stateless) |
-| POST | `/api/ingest` | extract **and store** a batch; returns id + stats |
-| GET  | `/api/batches` | list ingested batches |
-| GET  | `/api/batches/:id` | full result for one batch |
-| GET  | `/api/stats` | aggregate stats across all batches |
-| GET  | `/api/deals?status=&assetClass=` | reconstructed deals (RFQ→quote→fill) |
-| GET  | `/api/events?type=RFQ|QUOTE|FILL` | classified trade events |
-| GET  | `/api/flags?severity=high|medium|low` | compliance / conduct flags |
-| GET  | `/api/followups` | open follow-ups |
-| GET  | `/api/counterparties` | counterparty mentions + sentiment |
-| GET  | `/api/users` | per-user activity (messages, flags, tone) |
-
-## Examples
+## Test it
 ```bash
-# stateless extraction
-curl -s -X POST localhost:8787/api/extract \
+curl https://your-site.netlify.app/api/health
+curl -X POST https://your-site.netlify.app/api/extract \
   -H 'Content-Type: application/json' \
-  -d '{"transcript":"09:41 JM: looking for 25m EUR/USD where are you?\n09:41 DESK: 1.0842/1.0844\n09:42 JM: done at 44 cp Meridian"}'
-
-# ingest a batch, then query
-curl -s -X POST localhost:8787/api/ingest \
-  -H 'Content-Type: application/json' \
-  -d '{"transcript":"...chat...","source":"bbg_ib","desk":"FX-RATES"}'
-
-curl -s "localhost:8787/api/flags?severity=high"
-curl -s "localhost:8787/api/deals?status=filled"
+  -d '{"transcript":"09:41 JM: looking 25m EUR/USD cp Meridian\n09:41 DESK: 1.0842/1.0844\n09:42 JM: done with Meridian Capital\n09:44 RT: keep this off the record"}'
 ```
 
-## Response shapes (key objects)
-```jsonc
-// deal
-{ "id":"D1","inst":"EUR/USD","assetClass":"FX","size":"25m","notM":25,
-  "side":"","cp":"Meridian Cap","status":"filled",
-  "rfqTime":"09:41","quotePrice":"1.0842/1.0844","fillPrice":"1.0842/1.0844",
-  "t2q":0,"t2f":60 }            // t2q/t2f = seconds RFQ->quote / RFQ->fill
-
-// flag
-{ "time":"09:44","sender":"RT","sev":"high","term":"off the record",
-  "body":"keep this off the record between us" }
-
-// event
-{ "time":"09:41","sender":"JM","type":"RFQ","inst":"EUR/USD","assetClass":"FX",
-  "size":"25m","side":"","price":"","cp":"" }
-```
-
-## From here to production
-- Replace the in-memory store with an immutable, encrypted, indexed datastore
-  (5y+ WORM retention) inside your perimeter.
-- Put `POST /api/ingest` behind a queue fed by the Bloomberg Vault / email
-  journaling / voice-ASR collectors (see `../BACKEND-INTEGRATION.md`).
-- Add auth (API keys / OIDC), RBAC and request logging.
-- Strengthen the engine with ML classifiers, finance NER and counterparty
-  resolution against your CRM.
+## Connect the console
+Open the console with the API URL as a query param:
+`app.html?api=https://your-site.netlify.app`
+The console will POST the sample transcript to the live API and render the
+response (it falls back to the in-browser engine if the API is unreachable).
+Send me the URL and I'll hard-wire it into `app.html`.
