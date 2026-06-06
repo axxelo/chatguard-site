@@ -1,9 +1,16 @@
-// ChatGuard extraction API as a Netlify Function (stateless, no dependencies).
-// Routes:
-//   GET  /api/health         -> { ok: true }
-//   POST /api/extract        -> full extraction for { transcript }
-// Stateful storage endpoints (ingest/batches) need a database and are not
-// suitable for serverless; use the Express reference server (../backend) for those.
+/**
+ * ChatGuard — extraction API (Netlify Function, stateless)
+  *
+   * Copyright (c) 2024–2026 AXTRADE SAS. All rights reserved.
+    *
+     * PROPRIETARY AND CONFIDENTIAL
+      * This file is part of the ChatGuard software suite owned by AXTRADE SAS.
+       * Unauthorised copying, modification, distribution, or use of this file,
+        * via any medium, is strictly prohibited without the prior written consent
+         * of AXTRADE SAS.
+          *
+           * For licensing enquiries: legal@chatguard.co
+            */
 
 const { extract } = require("./engine");
 
