@@ -4,7 +4,7 @@ All files sit at the repository ROOT — no subfolders — so it uploads cleanly
 GitHub's web "Add files" page and serves directly with GitHub Pages.
 
   index.html  services.html  benefits.html  industries.html
-  faq.html  about.html  404.html
+  faq.html  about.html  demo.html  404.html
   chatguard.css   chatguard.js
   favicon.png  og-image.png   README.md
 
@@ -12,6 +12,10 @@ GitHub's web "Add files" page and serves directly with GitHub Pages.
 - index / services / benefits / industries — main site
 - faq.html — FAQ (with FAQPage structured data)
 - about.html — company / mission / offices
+- demo.html — LIVE extraction engine: paste/load Bloomberg-style chat and it
+  extracts RFQs, quotes, fills, counterparties, follow-ups, sentiment and
+  compliance flags entirely in-browser, with JSON/CSV export. Two tabs:
+  Desk Intelligence (amber) and Compliance & HR (green).
 - 404.html — served automatically by GitHub Pages for unknown URLs
 
 ## Making the contact form actually receive messages (Formspree)

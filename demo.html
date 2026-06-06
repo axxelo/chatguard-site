@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0A0E16">
+<link rel="canonical" href="https://www.chatguard.co/demo.html">
+<title>Live demo — ChatGuard extraction engine</title>
+<meta name="description" content="Paste or load Bloomberg-style chat and watch ChatGuard extract RFQs, quotes, fills, counterparties, follow-ups, sentiment and compliance flags in your browser.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chatguard.css">
+<style>
+.app{padding:54px 0 96px}
+.app-card{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden}
+.app-card .ahead{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.app-card .ahead .t{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-faint)}
+#chatInput{width:100%;min-height:230px;resize:vertical;border:none;background:transparent;color:var(--fg);
+  font-family:var(--mono);font-size:13px;line-height:1.7;padding:18px 20px;outline:none}
+.app-actions{display:flex;gap:12px;padding:14px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.btn-sm{padding:9px 16px;font-size:13px;border-radius:8px}
+.app-note{font-size:12px;color:var(--fg-faint);margin-top:14px;line-height:1.6}
+#results{margin-top:30px;display:none}
+.statline{display:grid;grid-template-columns:repeat(8,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+@media(max-width:900px){.statline{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:520px){.statline{grid-template-columns:repeat(2,1fr)}}
+.sc{background:var(--panel);padding:16px 14px}
+.sc .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--fg-faint)}
+.sc .v{font-family:var(--display);font-size:27px;font-weight:600;margin-top:6px;line-height:1}
+.tabbar{display:flex;gap:8px;margin:28px 0 18px;flex-wrap:wrap;align-items:center}
+.tab{font-family:var(--sans);font-weight:600;font-size:14px;padding:10px 18px;border-radius:9px;border:1px solid var(--line-2);
+  background:transparent;color:var(--fg-dim);cursor:pointer;transition:.2s}
+.tab:hover{color:var(--fg)}
+.tab.active[data-tab="intel"]{background:var(--amber);color:var(--btn-amber-fg);border-color:var(--amber)}
+.tab.active[data-tab="comp"]{background:var(--green);color:var(--btn-green-fg);border-color:var(--green)}
+.tab-export{margin-left:auto;display:flex;gap:8px}
+.panel{display:none}.panel.on{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.block{border:1px solid var(--line);border-radius:14px;background:var(--panel);margin-bottom:18px;overflow:hidden}
+.block .bh{padding:14px 18px;border-bottom:1px solid var(--line);font-weight:600;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.block .bh .c{font-family:var(--mono);font-size:11px;color:var(--fg-faint)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-faint);padding:11px 18px;border-bottom:1px solid var(--line);font-weight:500}
+td{padding:11px 18px;border-bottom:1px solid var(--line);color:var(--fg-dim);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.mono{font-family:var(--mono);color:var(--fg)}
+.pill{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.pill.RFQ{background:var(--amber-soft);color:var(--amber)}
+.pill.QUOTE{background:rgba(90,150,255,.14);color:#7FA8FF}
+.pill.FILL{background:var(--green-soft);color:var(--green)}
+.pill.high{background:var(--red-soft);color:var(--red)}
+.pill.medium{background:var(--amber-soft);color:var(--amber)}
+.pill.low{background:rgba(150,160,180,.16);color:var(--fg-dim)}
+.sent-pos{color:var(--green)}.sent-neg{color:var(--red)}.sent-neu{color:var(--fg-faint)}
+.empty{padding:22px 18px;color:var(--fg-faint);font-size:13px}
+.snippet{color:var(--fg-dim);font-style:italic}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header id="hdr">
+  <nav>
+    <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="cgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2A93B"/><stop offset="1" stop-color="#37D6A0"/></linearGradient></defs><path d="M16 2.5 27 6.1v8.2c0 7.4-5.2 12.1-11 14.7-5.8-2.6-11-7.3-11-14.7V6.1z" fill="none" stroke="url(#cgg)" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.6 11.4h10.8c.7 0 1.2.5 1.2 1.2v4.5c0 .7-.5 1.2-1.2 1.2H15l-3.1 2.9v-2.9h-1.3c-.7 0-1.2-.5-1.2-1.2v-4.5c0-.7.5-1.2 1.2-1.2z" fill="url(#cgg)"/></svg>Chat<b>Guard</b></a>
+    <div class="navlinks">
+      <a href="services.html">Services</a>
+      <a href="benefits.html">Benefits</a>
+      <a href="industries.html">Industries</a>
+      <a href="demo.html" class="active">Demo</a>
+      <a href="faq.html">FAQ</a>
+      <a href="about.html">About</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+      </button>
+      <a href="index.html#contact" class="btn btn-solid">Book a demo</a>
+      <button class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu"><a href="services.html">Services</a><a href="benefits.html">Benefits</a><a href="industries.html">Industries</a><a href="demo.html">Demo</a><a href="faq.html">FAQ</a><a href="about.html">About</a><a href="index.html#contact">Contact</a><a href="https://monitoring.chatguard.co">Log in</a><a class="btn btn-solid" href="index.html#contact">Book a demo</a></div>
+</header>
+
+<section class="page-hero" id="main">
+  <div class="wrap">
+    <div class="crumb reveal"><a href="index.html">Home</a> / Demo</div>
+    <h1 class="reveal" style="transition-delay:.05s">Watch it read the <span class="em">chat</span>.</h1>
+    <p class="reveal" style="transition-delay:.1s">This is the ChatGuard extraction engine running live in your browser. Paste a Bloomberg-style transcript — or load the sample — and it structures RFQs, quotes, fills, counterparties, follow-ups and sentiment for the desk, and surfaces compliance flags for the firm.</p>
+  </div>
+</section>
+
+<section class="app" style="padding-top:0">
+  <div class="wrap">
+    <div class="app-card reveal">
+      <div class="ahead"><span class="t">Paste chat transcript · IB chat / persistent room / email</span><span class="t" id="lineCount">0 lines</span></div>
+      <textarea id="chatInput" spellcheck="false" placeholder="09:41 JM: looking for 25m EUR/USD spot where are you?&#10;09:41 DESK: 1.0842 / 1.0844 can do 25 your side&#10;09:42 JM: done at 44 thanks"></textarea>
+      <div class="app-actions">
+        <button class="btn btn-solid btn-sm" id="btnExtract">Extract intelligence →</button>
+        <button class="btn btn-ghost btn-sm" id="btnSample">Load sample desk chat</button>
+        <button class="btn btn-ghost btn-sm" id="btnClear">Clear</button>
+      </div>
+    </div>
+    <p class="app-note reveal">This prototype runs entirely in your browser — nothing is uploaded or stored. Formats supported: <span class="mono">HH:MM SENDER: message</span>, <span class="mono">[HH:MM] &lt;SENDER&gt; message</span>, or <span class="mono">SENDER: message</span>. In production the same engine connects to your live Bloomberg, email and voice feeds inside your own perimeter.</p>
+
+    <div id="results">
+      <div class="statline" id="statline"></div>
+
+      <div class="tabbar">
+        <button class="tab active" data-tab="intel">Desk Intelligence</button>
+        <button class="tab" data-tab="comp">Compliance &amp; HR</button>
+        <div class="tab-export">
+          <button class="btn btn-ghost btn-sm" id="btnJSON">Export JSON</button>
+          <button class="btn btn-ghost btn-sm" id="btnCSV">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="panel on" id="panel-intel">
+        <div class="block">
+          <div class="bh">Extracted trade events <span class="c" id="evCount"></span></div>
+          <div style="overflow-x:auto"><table id="evTable"></table></div>
+        </div>
+        <div class="block">
+          <div class="bh">Counterparty intelligence <span class="c">mentions &amp; sentiment</span></div>
+          <div style="overflow-x:auto"><table id="cpTable"></table></div>
+        </div>
+        <div class="block">
+          <div class="bh">Open follow-ups <span class="c">commitments to chase</span></div>
+          <table id="fuTable"></table>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-comp">
+        <div class="block">
+          <div class="bh">Compliance &amp; conduct flags <span class="c" id="flCount"></span></div>
+          <div style="overflow-x:auto"><table id="flTable"></table></div>
+        </div>
+        <div class="block">
+          <div class="bh">Per-user activity <span class="c">messages, flags, tone</span></div>
+          <div style="overflow-x:auto"><table id="usTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="index.html" class="logo" style="margin-bottom:18px"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="cgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2A93B"/><stop offset="1" stop-color="#37D6A0"/></linearGradient></defs><path d="M16 2.5 27 6.1v8.2c0 7.4-5.2 12.1-11 14.7-5.8-2.6-11-7.3-11-14.7V6.1z" fill="none" stroke="url(#cgg)" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.6 11.4h10.8c.7 0 1.2.5 1.2 1.2v4.5c0 .7-.5 1.2-1.2 1.2H15l-3.1 2.9v-2.9h-1.3c-.7 0-1.2-.5-1.2-1.2v-4.5c0-.7.5-1.2 1.2-1.2z" fill="url(#cgg)"/></svg>Chat<b>Guard</b></a>
+        <p style="max-width:280px">The ultimate compliance chat monitoring &amp; desk-intelligence platform.</p>
+        <p class="mono" style="color:var(--fg-faint);margin-top:10px">A product of Axtrade Capital</p>
+      </div>
+      <div><h5>Platform</h5><a href="services.html">Services</a><a href="demo.html">Live demo</a><a href="services.html#intelligence">Desk Intelligence</a><a href="services.html#compliance">Compliance &amp; HR</a><a href="https://monitoring.chatguard.co">Log in</a></div>
+      <div><h5>Company</h5><a href="benefits.html">Benefits</a><a href="industries.html">Industries</a><a href="faq.html">FAQ</a><a href="about.html">About</a><a href="index.html#contact">Contact</a></div>
+      <div><h5>Offices</h5><p class="office"><b>United Kingdom</b>67 Redcliffe Gardens, SW10 9JJ London</p><p class="office"><b>France</b>35 Rue Cler, 75007 Paris</p><p class="office"><b>USA</b>111 Congress Ave, Suite 500, Austin, TX 78701</p></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 ChatGuard. All rights reserved.</span>
+      <span style="display:flex;gap:20px"><a href="https://www.chatguard.co/privacypolicy/">Privacy Policy</a><a href="https://www.chatguard.co/cookiepolicy/">Cookie Policy</a><a href="faq.html">FAQ</a></span>
+    </div>
+    <p class="disclaimer">Demo output is illustrative and generated by client-side heuristics for demonstration. ChatGuard provides communications surveillance and analytics tooling; monitoring of employee communications must follow applicable employment and data-protection law (including UK GDPR). ChatGuard does not provide legal advice.</p>
+  </div>
+</footer>
+
+<script src="chatguard.js"></script>
+<script>
+const SAMPLE = `09:41 JM: morning all, looking for 25m EUR/USD spot where are you?
+09:41 DESK: 1.0842 / 1.0844, can do 25 your side
+09:42 JM: done at 44 thanks, great level. cp Meridian Cap
+09:43 DESK: confirmed at 1.0844, will send confirm by 10:00
+09:44 RT: can you keep this off the record between us? don't want it on the tape
+09:45 DESK: noted. RT also need a price on 50m EUR 5y swap
+09:46 RT: where are you on the 5y? looking for mid
+09:47 DESK: i make 2.41 / 2.43 in 50m vs Northbridge
+09:48 RT: nothing there, slow again, this is the third time we are late, unhappy
+09:51 JM: ping me on whatsapp later for the next one
+09:58 KL: axe to sell 10m GBP/USD, where can you pay?
+09:59 DESK: 1.2710 bid for 10 in GBP/USD
+10:00 KL: done, yours at 10. appreciate the quick turn
+10:02 DESK: chase Northbridge on the 50m swap, still pending`;
+
+function extract(text){
+  const lines = text.split(/\r?\n/);
+  const SIZE = /\b(\d+(?:\.\d+)?)\s?(k|m|mm|bn|yards?|mio|mln)\b/i;
+  const FX   = /\b([A-Z]{3}\/[A-Z]{3}|EUR|USD|GBP|JPY|CHF|AUD|CAD|NZD)(?:\/[A-Z]{3})?\b/;
+  const FXPAIR = /\b([A-Z]{3}\/[A-Z]{3})\b/;
+  const TENOR = /\b(\d{1,2}\s?(?:y|yr|yrs|year|m|mo))\b/i;
+  const TWO_SIDED = /(\d+(?:\.\d+)?)\s?[\/\-]\s?(\d+(?:\.\d+)?)/;
+  const AT_PRICE  = /(?:@|at)\s?(\d+(?:\.\d{2,6}))/i;
+  const KW = {
+    rfq:["looking for","where are you","where r u","where you","px on","price on","level on","can you make","make me","show me","rfq","quote on","mid on","axe","your axe","interest in","what's your","whats your","where do you","where's","can i get","need a price","where can you pay","where can you"],
+    quote:["i make","i show","bid","offer","choice","i'm a","im a","quote is","showing","bid for","offer at"],
+    fill:["done","fill","filled","mine","yours","i buy","i sell","you buy","you sell","agreed","confirmed at","done at","trade","i'll take","ill take","i take","ur done","you're done"],
+    follow:["will confirm","confirm by","revert","get back","follow up","follow-up","send confirm","check and","let me check","come back to you","i'll send","ill send","send you the","by eod","by end of day","tomorrow","later today","chase","ttyl","await","awaiting","pending"]
+  };
+  const FLAGS=[
+    {sev:"high",terms:["off the record","between us","keep this quiet","keep it quiet","don't tell","dont tell","delete this","delete the","wash trade","manipulate","ramp the","front run","front-run","inside info","insider","material non-public","non public","mnpi","guarantee you","guaranteed return","collude","spoof","layering","fix the rate","rig the"]},
+    {sev:"medium",terms:["whatsapp","signal app","telegram","personal email","gmail","my cell","my mobile","call my","take it offline","off channel","off-channel","gift","tickets","entertainment","backhander","cash payment","under the table"]},
+    {sev:"low",terms:["idiot","stupid","screwed","pissed","wtf","shut up","hate this","useless"]}
+  ];
+  const POS=["thanks","thank you","great","appreciate","good","nice","perfect","cheers","helpful","welcome","pleasure","excellent","love it","well done","quick turn"];
+  const NEG=["unhappy","angry","wrong","late","problem","issue","unacceptable","disappointed","slow","missed","complaint","frustrat","poor","terrible","worse","worst","annoyed","not good","never again","fed up","nothing there"];
+  const P1=/^(\d{1,2}:\d{2}(?::\d{2})?)\s+([A-Za-z0-9_.\-]{1,14})\s*[:\-\u2013]?\s+(.*)$/;
+  const P2=/^\[(\d{1,2}:\d{2}(?::\d{2})?)\]\s*<?([A-Za-z0-9_.\-]{1,14})>?\s*[:\-]?\s*(.*)$/;
+  const P3=/^([A-Za-z0-9_.\-]{1,14})\s*[:\-\u2013]\s+(.*)$/;
+  const msgs=[];let last=null;
+  for(const raw of lines){
+    const ln=raw.trim();if(!ln)continue;let m,time="",sender="",body="";
+    if((m=ln.match(P2))){time=m[1];sender=m[2];body=m[3];}
+    else if((m=ln.match(P1))){time=m[1];sender=m[2];body=m[3];}
+    else if((m=ln.match(P3))){sender=m[1];body=m[2];}
+    else{if(last){last.body+=" "+ln;continue;}else{body=ln;sender="?";}}
+    last={time,sender,body,types:[],flags:[],sentiment:0};msgs.push(last);
+  }
+  const has=(s,arr)=>arr.find(k=>s.includes(k));
+  const events=[],followups=[],flagsOut=[];const cps={},byUser={};
+  let rfq=0,quote=0,fill=0;
+  for(const x of msgs){
+    const low=x.body.toLowerCase();
+    byUser[x.sender]=byUser[x.sender]||{msgs:0,flags:0,sent:0};byUser[x.sender].msgs++;
+    const inst=(x.body.match(FXPAIR)||x.body.match(TENOR)||x.body.match(FX)||[])[0]||"";
+    const sz=(x.body.match(SIZE)||[])[0]||"";
+    const two=x.body.match(TWO_SIDED);const at=x.body.match(AT_PRICE);
+    const price=two?(two[1]+"/"+two[2]):(at?at[1]:"");
+    let cp="";const cpm=x.body.match(/(?:cp|counterparty|vs\.?|with|client|for)\s+([A-Z][A-Za-z]+(?:\s[A-Z][A-Za-z]+){0,2})/);
+    if(cpm)cp=cpm[1].trim();
+    const isFill=!!has(low,KW.fill);
+    const isQuote=!!(two||(has(low,KW.quote)&&inst));
+    const isRFQ=!!(has(low,KW.rfq)||(sz&&inst&&/where|px|price|level|make|quote|looking|need|pay/.test(low)));
+    let type=isFill?"FILL":(isQuote?"QUOTE":(isRFQ?"RFQ":""));
+    if(type==="RFQ")rfq++;else if(type==="QUOTE")quote++;else if(type==="FILL")fill++;
+    if(type){x.types.push(type);events.push({time:x.time,sender:x.sender,type,inst,size:sz,price,cp,body:x.body});}
+    if(cp){cps[cp]=cps[cp]||{mentions:0,sent:0};cps[cp].mentions++;}
+    if(has(low,KW.follow))followups.push({time:x.time,sender:x.sender,body:x.body});
+    let s=0;POS.forEach(w=>{if(low.includes(w))s++;});NEG.forEach(w=>{if(low.includes(w))s--;});
+    x.sentiment=s;byUser[x.sender].sent+=s;if(cp)cps[cp].sent+=s;
+    for(const grp of FLAGS){const hit=has(low,grp.terms);if(hit){x.flags.push({sev:grp.sev,term:hit});flagsOut.push({time:x.time,sender:x.sender,sev:grp.sev,term:hit,body:x.body});byUser[x.sender].flags++;}}
+  }
+  const hit=rfq?Math.round(100*fill/rfq):0;
+  return{stats:{messages:msgs.length,rfq,quote,fill,hit,followups:followups.length,flags:flagsOut.length,users:Object.keys(byUser).length},
+    events,followups,flags:flagsOut,
+    counterparties:Object.entries(cps).map(([n,v])=>({name:n,...v})).sort((a,b)=>b.mentions-a.mentions),
+    byUser:Object.entries(byUser).map(([n,v])=>({user:n,...v})).sort((a,b)=>b.msgs-a.msgs)};
+}
+
+const $=id=>document.getElementById(id);
+const esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const sentClass=n=>n>0?"sent-pos":n<0?"sent-neg":"sent-neu";
+const sentTxt=n=>n>0?("+"+n+" positive"):n<0?(n+" negative"):"neutral";
+let LAST=null;
+
+function render(r){
+  LAST=r;
+  $("results").style.display="block";
+  const s=r.stats;
+  $("statline").innerHTML=[
+    ["Messages",s.messages,""],["RFQs",s.rfq,"var(--amber)"],["Quotes",s.quote,"#7FA8FF"],
+    ["Fills",s.fill,"var(--green)"],["Hit rate",s.hit+"%",""],["Follow-ups",s.followups,""],
+    ["Flags",s.flags,s.flags?"var(--red)":""],["Users",s.users,""]
+  ].map(([k,v,c])=>`<div class="sc"><div class="k">${k}</div><div class="v" style="${c?'color:'+c:''}">${v}</div></div>`).join("");
+
+  $("evCount").textContent=r.events.length+" detected";
+  $("evTable").innerHTML=r.events.length?
+    `<tr><th>Time</th><th>From</th><th>Type</th><th>Instrument</th><th>Size</th><th>Price</th><th>Counterparty</th></tr>`+
+    r.events.map(e=>`<tr><td class="mono">${esc(e.time)||"—"}</td><td class="mono">${esc(e.sender)}</td><td><span class="pill ${e.type}">${e.type}</span></td><td class="mono">${esc(e.inst)||"—"}</td><td class="mono">${esc(e.size)||"—"}</td><td class="mono">${esc(e.price)||"—"}</td><td>${esc(e.cp)||"—"}</td></tr>`).join("")
+    :`<tr><td class="empty">No trade events detected.</td></tr>`;
+
+  $("cpTable").innerHTML=r.counterparties.length?
+    `<tr><th>Counterparty</th><th>Mentions</th><th>Sentiment</th></tr>`+
+    r.counterparties.map(c=>`<tr><td>${esc(c.name)}</td><td class="mono">${c.mentions}</td><td class="${sentClass(c.sent)}">${sentTxt(c.sent)}</td></tr>`).join("")
+    :`<tr><td class="empty">No counterparties detected. Tip: mark them with "cp Name", "vs Name" or "with Name".</td></tr>`;
+
+  $("fuTable").innerHTML=r.followups.length?
+    `<tr><th>Time</th><th>From</th><th>Open item</th></tr>`+
+    r.followups.map(f=>`<tr><td class="mono">${esc(f.time)||"—"}</td><td class="mono">${esc(f.sender)}</td><td class="snippet">${esc(f.body)}</td></tr>`).join("")
+    :`<tr><td class="empty">No open follow-ups detected.</td></tr>`;
+
+  $("flCount").textContent=r.flags.length+" flagged";
+  $("flTable").innerHTML=r.flags.length?
+    `<tr><th>Time</th><th>From</th><th>Severity</th><th>Trigger</th><th>Message</th></tr>`+
+    r.flags.map(f=>`<tr><td class="mono">${esc(f.time)||"—"}</td><td class="mono">${esc(f.sender)}</td><td><span class="pill ${f.sev}">${f.sev}</span></td><td class="mono">${esc(f.term)}</td><td class="snippet">${esc(f.body)}</td></tr>`).join("")
+    :`<tr><td class="empty">No compliance or conduct flags raised.</td></tr>`;
+
+  $("usTable").innerHTML=
+    `<tr><th>User</th><th>Messages</th><th>Flags</th><th>Tone</th></tr>`+
+    r.byUser.map(u=>`<tr><td class="mono">${esc(u.user)}</td><td class="mono">${u.msgs}</td><td class="mono" style="${u.flags?'color:var(--red)':''}">${u.flags}</td><td class="${sentClass(u.sent)}">${sentTxt(u.sent)}</td></tr>`).join("");
+
+  $("results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function download(name,content,type){
+  const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+}
+function toCSV(events){
+  const head=["time","sender","type","instrument","size","price","counterparty","message"];
+  const rows=events.map(e=>[e.time,e.sender,e.type,e.inst,e.size,e.price,e.cp,e.body]
+    .map(v=>'"'+String(v||"").replace(/"/g,'""')+'"').join(","));
+  return head.join(",")+"\n"+rows.join("\n");
+}
+
+document.addEventListener("DOMContentLoaded",function(){
+  const input=$("chatInput");
+  const updateCount=()=>{$("lineCount").textContent=(input.value.split(/\r?\n/).filter(l=>l.trim()).length)+" lines";};
+  input.addEventListener("input",updateCount);
+  $("btnSample").addEventListener("click",()=>{input.value=SAMPLE;updateCount();render(extract(SAMPLE));});
+  $("btnExtract").addEventListener("click",()=>{if(input.value.trim())render(extract(input.value));});
+  $("btnClear").addEventListener("click",()=>{input.value="";updateCount();$("results").style.display="none";});
+  $("btnJSON").addEventListener("click",()=>{if(LAST)download("chatguard-extract.json",JSON.stringify(LAST,null,2),"application/json");});
+  $("btnCSV").addEventListener("click",()=>{if(LAST)download("chatguard-events.csv",toCSV(LAST.events),"text/csv");});
+  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",function(){
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    this.classList.add("active");
+    const k=this.dataset.tab;
+    $("panel-intel").classList.toggle("on",k==="intel");
+    $("panel-comp").classList.toggle("on",k==="comp");
+  }));
+});
+</script>
+</body>
+</html>
