@@ -88,3 +88,34 @@ npm start
 - Add auth (API keys / OIDC), RBAC and request logging.
 - Strengthen the engine with ML classifiers, finance NER and counterparty
   resolution against your CRM.
+
+## Legal & Intellectual Property
+
+> **© 2024–2026 AXTRADE SAS — All rights reserved.**
+>
+> ChatGuard and all associated source code, algorithms, documentation, UI assets, and data models are the exclusive property of **AXTRADE SAS**.
+>
+> ### Proprietary & Confidential
+>
+> This software is **proprietary and confidential**. No part of this repository may be reproduced, distributed, reverse-engineered, decompiled, disassembled, or used to create derivative works without the prior written consent of AXTRADE SAS.
+>
+> ### Restrictions
+>
+> - **No redistribution** — You may not copy, share, publish, or redistribute any part of this codebase.
+> - - **No commercial use** — Using this software or any portion thereof for commercial purposes without a valid licence is strictly prohibited.
+>   - - **No reverse engineering** — Decompiling, disassembling, or otherwise attempting to derive source code from any compiled or obfuscated form is prohibited.
+>     - - **No warranty** — This software is provided "as is", without warranty of any kind, express or implied.
+>      
+>       - ### Licence
+>      
+>       - Access to this repository is granted solely for evaluation and internal review purposes. Any use beyond that scope requires a separate written agreement with AXTRADE SAS.
+>      
+>       - For licensing enquiries: **legal@chatguard.co**
+> 
+### Trade Marks
+
+"ChatGuard" and the ChatGuard logo are trade marks of AXTRADE SAS. Unauthorised use of these marks is prohibited.
+
+---
+
+*Unauthorised use of this software may result in civil and criminal penalties under applicable law.*
