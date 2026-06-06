@@ -1,42 +1,75 @@
-# ChatGuard site (flat layout)
+# ChatGuard — reference extraction API
 
-All files sit at the repository ROOT — no subfolders — so it uploads cleanly via
-GitHub's web "Add files" page and serves directly with GitHub Pages.
+A runnable backend that exposes the ChatGuard chat-intelligence engine over HTTP.
+This is the bridge between the in-browser demo and a production system: the same
+extraction logic, behind real endpoints your apps can call. Storage is in-memory
+(swap for a database in production). For the full production architecture and the
+Bloomberg capture path, see `../BACKEND-INTEGRATION.md`.
 
-  index.html  services.html  benefits.html  industries.html
-  faq.html  about.html  demo.html  404.html
-  chatguard.css   chatguard.js
-  favicon.png  og-image.png   README.md
+## Run it
+```bash
+cd backend
+npm install
+npm start          # http://localhost:8787
+npm test           # smoke test (no server needed)
+```
+Requires Node 18+.
 
-## Pages
-- index / services / benefits / industries — main site
-- faq.html — FAQ (with FAQPage structured data)
-- about.html — company / mission / offices
-- demo.html — LIVE extraction engine: paste/load Bloomberg-style chat and it
-  extracts RFQs, quotes, fills, counterparties, follow-ups, sentiment and
-  compliance flags entirely in-browser, with JSON/CSV export. Two tabs:
-  Desk Intelligence (amber) and Compliance & HR (green).
-- 404.html — served automatically by GitHub Pages for unknown URLs
+## Endpoints
 
-## Making the contact form actually receive messages (Formspree)
-The home-page form works out of the box via a pre-filled email (mailto). To
-collect submissions automatically instead:
-1. Create a free form at formspree.io and copy its endpoint
-   (looks like https://formspree.io/f/abcdwxyz).
-2. In index.html, find:  <form id="contactForm" novalidate data-endpoint="">
-3. Paste the endpoint between the quotes:
-   data-endpoint="https://formspree.io/f/abcdwxyz"
-4. Re-upload index.html. Submissions now arrive by email with a success message
-   shown on the page; if the endpoint is left blank it falls back to mailto.
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET  | `/health` | liveness check |
+| POST | `/api/extract` | extract from a transcript, **no storage** (stateless) |
+| POST | `/api/ingest` | extract **and store** a batch; returns id + stats |
+| GET  | `/api/batches` | list ingested batches |
+| GET  | `/api/batches/:id` | full result for one batch |
+| GET  | `/api/stats` | aggregate stats across all batches |
+| GET  | `/api/deals?status=&assetClass=` | reconstructed deals (RFQ→quote→fill) |
+| GET  | `/api/events?type=RFQ|QUOTE|FILL` | classified trade events |
+| GET  | `/api/flags?severity=high|medium|low` | compliance / conduct flags |
+| GET  | `/api/followups` | open follow-ups |
+| GET  | `/api/counterparties` | counterparty mentions + sentiment |
+| GET  | `/api/users` | per-user activity (messages, flags, tone) |
 
-## Deploy / custom domain
-- GitHub Pages: Settings → Pages → Deploy from a branch → main → / (root).
-- Custom domain chatguard.co: apex A records to 185.199.108-111.153 and a
-  CNAME www → axxelo.github.io, then set the domain in Settings → Pages and
-  enable Enforce HTTPS.
+## Examples
+```bash
+# stateless extraction
+curl -s -X POST localhost:8787/api/extract \
+  -H 'Content-Type: application/json' \
+  -d '{"transcript":"09:41 JM: looking for 25m EUR/USD where are you?\n09:41 DESK: 1.0842/1.0844\n09:42 JM: done at 44 cp Meridian"}'
 
-## Before publishing
-- Dashboard figures and counterparty names (Meridian Cap, Northbridge) are placeholders.
-- Re-verify the FCA stats (£52.8m, 1,266 firms) before relying on them.
-- Footer disclaimer is a placeholder, not legal advice.
-- Swap the drawn logo for a real brand file whenever you have one.
+# ingest a batch, then query
+curl -s -X POST localhost:8787/api/ingest \
+  -H 'Content-Type: application/json' \
+  -d '{"transcript":"...chat...","source":"bbg_ib","desk":"FX-RATES"}'
+
+curl -s "localhost:8787/api/flags?severity=high"
+curl -s "localhost:8787/api/deals?status=filled"
+```
+
+## Response shapes (key objects)
+```jsonc
+// deal
+{ "id":"D1","inst":"EUR/USD","assetClass":"FX","size":"25m","notM":25,
+  "side":"","cp":"Meridian Cap","status":"filled",
+  "rfqTime":"09:41","quotePrice":"1.0842/1.0844","fillPrice":"1.0842/1.0844",
+  "t2q":0,"t2f":60 }            // t2q/t2f = seconds RFQ->quote / RFQ->fill
+
+// flag
+{ "time":"09:44","sender":"RT","sev":"high","term":"off the record",
+  "body":"keep this off the record between us" }
+
+// event
+{ "time":"09:41","sender":"JM","type":"RFQ","inst":"EUR/USD","assetClass":"FX",
+  "size":"25m","side":"","price":"","cp":"" }
+```
+
+## From here to production
+- Replace the in-memory store with an immutable, encrypted, indexed datastore
+  (5y+ WORM retention) inside your perimeter.
+- Put `POST /api/ingest` behind a queue fed by the Bloomberg Vault / email
+  journaling / voice-ASR collectors (see `../BACKEND-INTEGRATION.md`).
+- Add auth (API keys / OIDC), RBAC and request logging.
+- Strengthen the engine with ML classifiers, finance NER and counterparty
+  resolution against your CRM.

@@ -1,0 +1,14 @@
+{
+  "name": "chatguard-api",
+  "version": "0.1.0",
+  "description": "ChatGuard reference extraction API — exposes the chat-intelligence engine over HTTP.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "engines": { "node": ">=18" }
+}
